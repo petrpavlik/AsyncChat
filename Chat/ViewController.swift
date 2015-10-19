@@ -74,8 +74,20 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
             self.scrollToBottom(false)
         }
         
-        startSwitchingTypingState()
-        startAddingMessages()
+        inputBar.keyboardFrameChangedBlock = { [weak self] (frame: CGRect) in
+            
+            self?.inputBarBottomOffsetConstraint.constant = self!.view.bounds.height - frame.origin.y
+            self?.view.layoutIfNeeded()
+            self?.reactToKeyboardFrameChange()
+        }
+        
+        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
+        dispatch_after(delayTime, dispatch_get_main_queue()) { [weak self] in
+            self?.typing = true
+        }
+        
+        //startSwitchingTypingState()
+        //startAddingMessages()
     }
     
     // MARK:
@@ -93,7 +105,9 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
         } else if indexPath.section == Sections.LoadingIndicator.rawValue {
             return LoadingCellNode()
         } else {
-            return TypingCellNode()
+            let cellNode = TypingCellNode()
+            cellNode.configure(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!)
+            return cellNode
         }
     }
     
@@ -138,6 +152,7 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
     }
     
     func keyboardNotification(notification: NSNotification) {
+        print("frame changed")
         if let userInfo = notification.userInfo {
             let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.CGRectValue()
             let duration:NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0

@@ -9,6 +9,8 @@
 import UIKit
 
 class ChatInputBar: UIView, UITextViewDelegate {
+    
+    var keyboardFrameChangedBlock: ((frame: CGRect) -> Void)?
 
     private let textView: UITextView = {
        let textView = UITextView()
@@ -37,6 +39,13 @@ class ChatInputBar: UIView, UITextViewDelegate {
         
         textView.textContainer.lineFragmentPadding = 0
         textView.contentInset = UIEdgeInsetsZero
+        
+        let detectorView = KeyboardFrameDetectorInputView()
+        detectorView.keyboardFrameChangedBlock = { [weak self] (frame: CGRect) in
+            self?.keyboardFrameChangedBlock?(frame: frame)
+        }
+        
+        textView.inputAccessoryView = detectorView
         
         textView.translatesAutoresizingMaskIntoConstraints = false
         sendButton.translatesAutoresizingMaskIntoConstraints = false

@@ -19,6 +19,7 @@
 		EFAFCEDA1BB6EE3900E91371 /* ChatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAFCED91BB6EE3900E91371 /* ChatTests.swift */; };
 		EFAFCEE51BB6EE3900E91371 /* ChatUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAFCEE41BB6EE3900E91371 /* ChatUITests.swift */; };
 		EFAFCEF31BB6EEE300E91371 /* ChatToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAFCEF21BB6EEE300E91371 /* ChatToolbar.swift */; settings = {ASSET_TAGS = (); }; };
+		EFF273721BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF273711BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +61,7 @@
 		EFAFCEE41BB6EE3900E91371 /* ChatUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatUITests.swift; sourceTree = "<group>"; };
 		EFAFCEE61BB6EE3900E91371 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EFAFCEF21BB6EEE300E91371 /* ChatToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ChatToolbar.swift; path = Classes/ChatToolbar.swift; sourceTree = "<group>"; };
+		EFF273711BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KeyboardFrameDetectorInputView.swift; path = Classes/KeyboardFrameDetectorInputView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,25 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		EF1B72881BD5249E00657358 /* Toolbar */ = {
+			isa = PBXGroup;
+			children = (
+				EFAFCEF21BB6EEE300E91371 /* ChatToolbar.swift */,
+				EFF273711BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift */,
+			);
+			name = Toolbar;
+			sourceTree = "<group>";
+		};
+		EF1B72891BD524B200657358 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				EF01B7FD1BB84B3500EAFB86 /* ChatCellNode.swift */,
+				EF14D32E1BBD6BE500AE5D62 /* TypingCellNode.swift */,
+				EF795E6A1BBFF98800EB6033 /* LoadingCellNode.swift */,
+			);
+			name = Cells;
+			sourceTree = "<group>";
+		};
 		EFAFCEB81BB6EE3900E91371 = {
 			isa = PBXGroup;
 			children = (
@@ -122,17 +143,15 @@
 		EFAFCEC31BB6EE3900E91371 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
+				EF1B72891BD524B200657358 /* Cells */,
+				EF1B72881BD5249E00657358 /* Toolbar */,
 				EFAFCEC41BB6EE3900E91371 /* AppDelegate.swift */,
 				EFAFCEC61BB6EE3900E91371 /* ViewController.swift */,
 				EFAFCEC81BB6EE3900E91371 /* Main.storyboard */,
 				EFAFCECB1BB6EE3900E91371 /* Assets.xcassets */,
 				EFAFCECD1BB6EE3900E91371 /* LaunchScreen.storyboard */,
 				EFAFCED01BB6EE3900E91371 /* Info.plist */,
-				EFAFCEF21BB6EEE300E91371 /* ChatToolbar.swift */,
 				EF3F21721BB6F69600B73468 /* Chat-Bridging-Header.h */,
-				EF01B7FD1BB84B3500EAFB86 /* ChatCellNode.swift */,
-				EF14D32E1BBD6BE500AE5D62 /* TypingCellNode.swift */,
-				EF795E6A1BBFF98800EB6033 /* LoadingCellNode.swift */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -331,6 +350,7 @@
 			files = (
 				EF14D32F1BBD6BE500AE5D62 /* TypingCellNode.swift in Sources */,
 				EFAFCEC71BB6EE3900E91371 /* ViewController.swift in Sources */,
+				EFF273721BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift in Sources */,
 				EF795E6B1BBFF98800EB6033 /* LoadingCellNode.swift in Sources */,
 				EFAFCEC51BB6EE3900E91371 /* AppDelegate.swift in Sources */,
 				EFAFCEF31BB6EEE300E91371 /* ChatToolbar.swift in Sources */,
