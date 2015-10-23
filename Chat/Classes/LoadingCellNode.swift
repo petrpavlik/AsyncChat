@@ -10,7 +10,16 @@ import UIKit
 
 class LoadingCellNode: ASCellNode {
     
-    private let loadingNode = ASDisplayNode { () -> UIView! in
+    private class ActivityIndicatorNode: ASDisplayNode {
+        private override func didLoad() {
+            super.didLoad()
+            
+            let activityIndicator = view as! UIActivityIndicatorView
+            activityIndicator.startAnimating()
+        }
+    }
+    
+    private let loadingNode = ActivityIndicatorNode { () -> UIView! in
         let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
         activityIndicator.startAnimating()
         activityIndicator.hidesWhenStopped = false

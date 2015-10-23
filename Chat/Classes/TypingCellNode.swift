@@ -10,24 +10,57 @@ import UIKit
 
 class TypingCellNode: ASCellNode {
     
+    func startAnimating() {
+        circleNode0.startAnimating()
+        circleNode1.startAnimating()
+        circleNode2.startAnimating()
+    }
+    
+    static private let dotImage: UIImage = {
+        UIGraphicsBeginImageContextWithOptions(CGSizeMake(12, 12), false, UIScreen.mainScreen().scale)
+        CGContextSetRGBFillColor(UIGraphicsGetCurrentContext(), 0, 0, 0, 1.0)
+        CGContextFillEllipseInRect (UIGraphicsGetCurrentContext(), CGRectMake(0, 0, 12, 12));
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image!
+    }()
+    
+    private class CircleNode: ASImageNode {
+        
+        func startAnimating() {
+            
+        }
+        
+        private let animationDelay: NSTimeInterval
+        
+        init(animationDelay: NSTimeInterval) {
+            
+            self.animationDelay = animationDelay
+            
+            super.init()
+            
+            image = dotImage
+        }
+        
+        private override func displayDidFinish() {
+            super.displayDidFinish()
+            
+            dispatch_async(dispatch_get_main_queue()) { [weak self] in
+                if let strongSelf = self {
+                    UIView.animateWithDuration(0.5, delay: strongSelf.animationDelay, options: [.Autoreverse, .Repeat], animations: { () -> Void in
+                        self?.view.alpha = 0.5
+                        }, completion: nil)
+                }
+            }
+        }
+    }
+    
     private let avatarImageNode = ASNetworkImageNode()
     private let bubbleNode = ASDisplayNode()
     
-    private let circleNode0 = ASDisplayNode { () -> UIView! in
-        let view = UIView()
-        view.layer.cornerRadius = 6
-        view.backgroundColor = .blackColor()
-        
-        view.alpha = 1.0
-        UIView.animateWithDuration(1, delay: 0, options: [.Autoreverse, .Repeat], animations: { () -> Void in
-            view.alpha = 0.5
-        }, completion: nil)
-        
-        return view
-    }
-    
-    private let circleNode1 = ASDisplayNode()
-    private let circleNode2 = ASDisplayNode()
+    private let circleNode0 = CircleNode(animationDelay: 0)
+    private let circleNode1 = CircleNode(animationDelay: 0.2)
+    private let circleNode2 = CircleNode(animationDelay: 0.4)
     
     override init!() {
         super.init()
@@ -48,14 +81,6 @@ class TypingCellNode: ASCellNode {
         addSubnode(circleNode0)
         addSubnode(circleNode1)
         addSubnode(circleNode2)
-        
-        //circleNode0.backgroundColor = .blackColor()
-        circleNode1.backgroundColor = .blackColor()
-        circleNode2.backgroundColor = .blackColor()
-        
-        //circleNode0.layer.cornerRadius = 6
-        circleNode1.layer.cornerRadius = 6
-        circleNode2.layer.cornerRadius = 6
     }
     
     override func calculateSizeThatFits(constrainedSize: CGSize) -> CGSize {

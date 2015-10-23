@@ -56,7 +56,7 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
         
         messageTextNode.attributedString = attributedString
         
-        bubbleNode.backgroundColor = UIColor(red:0.941, green:0.941, blue:0.941, alpha: 1)
+        bubbleNode.backgroundColor = incomingMessageColorNormal
         
         invalidateCalculatedSize()
     }
@@ -78,7 +78,7 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
         
         messageTextNode.attributedString = attributedString
         
-        bubbleNode.backgroundColor = UIColor(red:0.004, green:0.518, blue:1.000, alpha: 1)
+        bubbleNode.backgroundColor = outgoingMessageColorNormal
         
         invalidateCalculatedSize()
     }
@@ -100,6 +100,10 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
     private let avatarBubbleHorizontalDistance: CGFloat = 8.0
     private let bubbleTextMargin: CGFloat = 10
     
+    private let incomingMessageColorNormal = UIColor(red:0.941, green:0.941, blue:0.941, alpha: 1)
+    private let incomingMessageColorSelected = UIColor(red:0.831, green:0.824, blue:0.827, alpha: 1)
+    private let outgoingMessageColorNormal = UIColor(red:0.004, green:0.518, blue:1.000, alpha: 1)
+    private let outgoingMessageColorSelected = UIColor(red:0.075, green:0.467, blue:0.976, alpha: 1)
     
     override init!() {
         super.init()
@@ -110,6 +114,8 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
         addSubnode(bubbleNode)
         addSubnode(messageTextNode)
         addSubnode(dateTextNode)
+        
+        messageTextNode.passthroughNonlinkTouches = true
         
         avatarImageNode.layer.masksToBounds = true
         avatarImageNode.layer.cornerRadius = 18
@@ -174,6 +180,81 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
     
     func textNode(textNode: ASTextNode!, tappedLinkAttribute attribute: String!, value: AnyObject!, atPoint point: CGPoint, textRange: NSRange) {
         UIApplication.sharedApplication().openURL(value as! NSURL)
+    }
+    
+    override func didLoad() {
+        super.didLoad()
+        
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: Selector("bubbleLongPressed:"))
+        view.addGestureRecognizer(longPressRecognizer)
+    }
+    
+    func bubbleLongPressed(recognizer: UITapGestureRecognizer) {
+        if recognizer.state == UIGestureRecognizerState.Began {
+            
+            let touchLocation = recognizer.locationInView(view)
+            if CGRectContainsPoint(bubbleNode.frame, touchLocation) {
+                
+                view.becomeFirstResponder()
+                
+                let menuController = UIMenuController.sharedMenuController()
+                menuController.menuItems = [UIMenuItem(title: "Copy", action: Selector("copySelected"))]
+                menuController.setTargetRect(CGRectMake(touchLocation.x, touchLocation.y-10, 0, 0), inView: view)
+                menuController.setMenuVisible(true, animated:true)
+            }
+        }
+    }
+    
+    override func touchesBegan(touches: Set<NSObject>!, withEvent event: UIEvent!) {
+        super.touchesBegan(touches, withEvent: event)
+        
+        setBubbleBackgroundForSelectedState()
+        
+        if UIMenuController.sharedMenuController().menuVisible == true {
+           UIMenuController.sharedMenuController().setMenuVisible(false, animated: true)
+            setBubbleBackgroundForNormalState()
+        }
+    }
+    
+    override func touchesEnded(touches: Set<NSObject>!, withEvent event: UIEvent!) {
+        super.touchesEnded(touches, withEvent: event)
+        
+        if UIMenuController.sharedMenuController().menuVisible == false {
+            setBubbleBackgroundForNormalState()
+        }
+    }
+    
+    override func touchesCancelled(touches: Set<NSObject>!, withEvent event: UIEvent!) {
+        super.touchesCancelled(touches, withEvent: event)
+        
+        if UIMenuController.sharedMenuController().menuVisible == false {
+            setBubbleBackgroundForNormalState()
+        }
+    }
+    
+    func copySelected() {
+        setBubbleBackgroundForNormalState()
+        UIPasteboard.generalPasteboard().string = messageTextNode.attributedString.string
+    }
+    
+    override func canBecomeFirstResponder() -> Bool {
+        return true
+    }
+    
+    private func setBubbleBackgroundForNormalState() {
+        if outgoingMessage == true {
+            bubbleNode.backgroundColor = outgoingMessageColorNormal
+        } else {
+            bubbleNode.backgroundColor = incomingMessageColorNormal
+        }
+    }
+    
+    private func setBubbleBackgroundForSelectedState() {
+        if outgoingMessage == true {
+            bubbleNode.backgroundColor = outgoingMessageColorSelected
+        } else {
+            bubbleNode.backgroundColor = incomingMessageColorSelected
+        }
     }
 
 }

@@ -111,6 +111,14 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
         }
     }
     
+    func tableView(tableView: ASTableView!, willDisplayNodeForRowAtIndexPath indexPath: NSIndexPath!) {
+        if indexPath.section == Sections.TypingIndicator.rawValue {
+            tableView.reloadSections(NSIndexSet(index: Sections.TypingIndicator.rawValue), withRowAnimation: .None)
+            //let typingCellNode = tableView.nodeForRowAtIndexPath(indexPath) as! TypingCellNode
+            //typingCellNode.startAnimating()
+        }
+    }
+    
     func tableView(tableView: UITableView!, numberOfRowsInSection section: Int) -> Int {
         switch section {
             case Sections.Content.rawValue: return 5
