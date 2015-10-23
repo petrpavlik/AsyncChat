@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import AsyncDisplayKit
 
 class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelegate {
     
     private var messages = [
         "三多摩地区開発による沿線人口の増加、相模原線延伸による多摩ニュータウン乗り入れ、都営地下鉄10号線（後の都営地下鉄新宿線、以下、新宿線と表記する）乗入構想により、京王線の利用客増加が見込まれ、相当数の車両を準備する必要に迫られるなか、製造費用、保守費用を抑えた新型車両として6000系が構想された[22]。新宿線建設に際してはすでに1号線（後の浅草線",
-        "AsyncDisplayKit is an iOS framework that keeps even the most complex user interfaces smooth and responsive. It was originally built to make Facebook's Paper possible, and goes hand-in-hand with pop's physics-based animations — but it's just as powerful with UIKit Dynamics and conventional app designs.",
+        "AsyncDisplayKit is an iOS framework that keeps even the most complex user interfaces smooth and responsive. It was originally built to make Facebook's Paper possible, and goes hand-in-hand with pop's physics-based animations — but it's just as powerful with UIKit Dynamics and conventional app designs. www.google.com",
         "Good morning",
         "EMOJIS!!!! Told ya, you can't use them omb 😂😂😂😂😂😂😂",
         "x"
@@ -81,10 +82,10 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
             self?.reactToKeyboardFrameChange()
         }
         
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
+        /*let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
         dispatch_after(delayTime, dispatch_get_main_queue()) { [weak self] in
             self?.typing = true
-        }
+        }*/
         
         //startSwitchingTypingState()
         //startAddingMessages()

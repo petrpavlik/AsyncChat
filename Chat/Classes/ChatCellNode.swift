@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import AsyncDisplayKit
+import Toucan
 
 class ChatCellNode: ASCellNode, ASTextNodeDelegate {
     
@@ -36,6 +38,7 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
         }
     }
     
+    
     func configureIncommingMessage(messageText: String, avatarURL: NSURL) {
         
         outgoingMessage = false
@@ -56,7 +59,7 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
         
         messageTextNode.attributedString = attributedString
         
-        bubbleNode.backgroundColor = incomingMessageColorNormal
+        bubbleNode.tintColor = incomingMessageColorNormal
         
         invalidateCalculatedSize()
     }
@@ -78,7 +81,8 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
         
         messageTextNode.attributedString = attributedString
         
-        bubbleNode.backgroundColor = outgoingMessageColorNormal
+        bubbleNode.tintColor = outgoingMessageColorNormal
+        bubbleNode.tintColorDidChange()
         
         invalidateCalculatedSize()
     }
@@ -86,7 +90,11 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
     var messageDate: NSDate?
     
     private let avatarImageNode = ASNetworkImageNode()
-    private let bubbleNode = ASDisplayNode()
+    private let bubbleNode = ASDisplayNode { () -> UIView! in
+        let imageView = UIImageView(image: bubbleImage)
+        //imageView.contentMode = UIViewContentMode.TopLeft
+        return imageView
+    }
     private let messageTextNode = ASTextNode()
     private let dateTextNode = ASTextNode()
     
@@ -105,6 +113,21 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
     private let outgoingMessageColorNormal = UIColor(red:0.004, green:0.518, blue:1.000, alpha: 1)
     private let outgoingMessageColorSelected = UIColor(red:0.075, green:0.467, blue:0.976, alpha: 1)
     
+    private static let bubbleImage: UIImage = {
+       
+        UIGraphicsBeginImageContextWithOptions(CGSizeMake(18*2, 18*2), false, UIScreen.mainScreen().scale)
+        let context = UIGraphicsGetCurrentContext()
+        CGContextSetFillColorWithColor(context, UIColor.blackColor().CGColor)
+        CGContextFillEllipseInRect(context, CGRectMake(0, 0, 18*2, 18*2));
+        var image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext();
+        
+        image = image.imageWithRenderingMode(.AlwaysTemplate)
+        image = image.resizableImageWithCapInsets(UIEdgeInsetsMake(18, 18, 18, 18))
+        
+        return image
+    }()
+    
     override init!() {
         super.init()
         
@@ -115,13 +138,18 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
         addSubnode(messageTextNode)
         addSubnode(dateTextNode)
         
+        avatarImageNode.imageModificationBlock = { image in
+            //return Toucan(image: image).maskWithEllipse().image
+            return Toucan(image: image).maskWithEllipse(borderWidth: 2, borderColor: UIColor.yellowColor()).image
+        }
+        
         messageTextNode.passthroughNonlinkTouches = true
         
-        avatarImageNode.layer.masksToBounds = true
-        avatarImageNode.layer.cornerRadius = 18
+        //avatarImageNode.layer.masksToBounds = true
+        //avatarImageNode.layer.cornerRadius = 18
         
-        bubbleNode.layer.masksToBounds = true
-        bubbleNode.layer.cornerRadius = 18
+        //bubbleNode.layer.masksToBounds = true
+        //bubbleNode.layer.cornerRadius = 18
         
         messageTextNode.delegate = self
         messageTextNode.userInteractionEnabled = true
@@ -243,17 +271,17 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
     
     private func setBubbleBackgroundForNormalState() {
         if outgoingMessage == true {
-            bubbleNode.backgroundColor = outgoingMessageColorNormal
+            bubbleNode.tintColor = outgoingMessageColorNormal
         } else {
-            bubbleNode.backgroundColor = incomingMessageColorNormal
+            bubbleNode.tintColor = incomingMessageColorNormal
         }
     }
     
     private func setBubbleBackgroundForSelectedState() {
         if outgoingMessage == true {
-            bubbleNode.backgroundColor = outgoingMessageColorSelected
+            bubbleNode.tintColor = outgoingMessageColorSelected
         } else {
-            bubbleNode.backgroundColor = incomingMessageColorSelected
+            bubbleNode.tintColor = incomingMessageColorSelected
         }
     }
 

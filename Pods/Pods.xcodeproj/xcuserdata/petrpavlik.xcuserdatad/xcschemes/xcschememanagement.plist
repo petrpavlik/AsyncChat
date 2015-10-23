@@ -14,15 +14,25 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>Toucan.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>5DE67289F850D70253C352FDC11F2BC7</key>
+		<key>2ABC78009258782FF1321222412FA69E</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>75852900130F9A5B4C6780A9B2B76A20</key>
+		<key>43EF105167B35D7E9A338DF0E3BC5965</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>977E396702F6A121F6D9BB7908E66351</key>
 		<dict>
 			<key>primary</key>
 			<true/>

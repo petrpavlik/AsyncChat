@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		662B331E6E0665C9423851D0 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CB242952C771A8898B643F5 /* libPods.a */; };
-		EF01B7FE1BB84B3500EAFB86 /* ChatCellNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF01B7FD1BB84B3500EAFB86 /* ChatCellNode.swift */; settings = {ASSET_TAGS = (); }; };
-		EF14D32F1BBD6BE500AE5D62 /* TypingCellNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF14D32E1BBD6BE500AE5D62 /* TypingCellNode.swift */; settings = {ASSET_TAGS = (); }; };
-		EF795E6B1BBFF98800EB6033 /* LoadingCellNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF795E6A1BBFF98800EB6033 /* LoadingCellNode.swift */; settings = {ASSET_TAGS = (); }; };
+		9A88BCBD4FA198A784FA82BC /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847224121E26B8D1AD7D9AD1 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		EF01B7FE1BB84B3500EAFB86 /* ChatCellNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF01B7FD1BB84B3500EAFB86 /* ChatCellNode.swift */; };
+		EF14D32F1BBD6BE500AE5D62 /* TypingCellNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF14D32E1BBD6BE500AE5D62 /* TypingCellNode.swift */; };
+		EF795E6B1BBFF98800EB6033 /* LoadingCellNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF795E6A1BBFF98800EB6033 /* LoadingCellNode.swift */; };
 		EFAFCEC51BB6EE3900E91371 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAFCEC41BB6EE3900E91371 /* AppDelegate.swift */; };
 		EFAFCEC71BB6EE3900E91371 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAFCEC61BB6EE3900E91371 /* ViewController.swift */; };
 		EFAFCECA1BB6EE3900E91371 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EFAFCEC81BB6EE3900E91371 /* Main.storyboard */; };
@@ -18,8 +18,8 @@
 		EFAFCECF1BB6EE3900E91371 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EFAFCECD1BB6EE3900E91371 /* LaunchScreen.storyboard */; };
 		EFAFCEDA1BB6EE3900E91371 /* ChatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAFCED91BB6EE3900E91371 /* ChatTests.swift */; };
 		EFAFCEE51BB6EE3900E91371 /* ChatUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAFCEE41BB6EE3900E91371 /* ChatUITests.swift */; };
-		EFAFCEF31BB6EEE300E91371 /* ChatToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAFCEF21BB6EEE300E91371 /* ChatToolbar.swift */; settings = {ASSET_TAGS = (); }; };
-		EFF273721BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF273711BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift */; settings = {ASSET_TAGS = (); }; };
+		EFAFCEF31BB6EEE300E91371 /* ChatToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAFCEF21BB6EEE300E91371 /* ChatToolbar.swift */; };
+		EFF273721BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF273711BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,7 +41,7 @@
 
 /* Begin PBXFileReference section */
 		13C50703FEB1BA928DD72114 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
-		2CB242952C771A8898B643F5 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		847224121E26B8D1AD7D9AD1 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF78232C614F8989CE0751E9 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		EF01B7FD1BB84B3500EAFB86 /* ChatCellNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ChatCellNode.swift; path = Classes/ChatCellNode.swift; sourceTree = "<group>"; };
 		EF14D32E1BBD6BE500AE5D62 /* TypingCellNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TypingCellNode.swift; path = Classes/TypingCellNode.swift; sourceTree = "<group>"; };
@@ -69,7 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				662B331E6E0665C9423851D0 /* libPods.a in Frameworks */,
+				9A88BCBD4FA198A784FA82BC /* Pods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -177,7 +177,7 @@
 		F6C8235FB062EE12A875F0DB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2CB242952C771A8898B643F5 /* libPods.a */,
+				847224121E26B8D1AD7D9AD1 /* Pods.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -194,6 +194,7 @@
 				EFAFCEBE1BB6EE3900E91371 /* Frameworks */,
 				EFAFCEBF1BB6EE3900E91371 /* Resources */,
 				A4EF55D4DA61038404F65435 /* Copy Pods Resources */,
+				05EFD2053B7AED9516C614C0 /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -311,6 +312,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		05EFD2053B7AED9516C614C0 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		A4EF55D4DA61038404F65435 /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
