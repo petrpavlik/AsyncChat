@@ -82,10 +82,10 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
             self?.reactToKeyboardFrameChange()
         }
         
-        /*let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
+        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
         dispatch_after(delayTime, dispatch_get_main_queue()) { [weak self] in
             self?.typing = true
-        }*/
+        }
         
         //startSwitchingTypingState()
         //startAddingMessages()
@@ -113,10 +113,12 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
     }
     
     func tableView(tableView: ASTableView!, willDisplayNodeForRowAtIndexPath indexPath: NSIndexPath!) {
-        if indexPath.section == Sections.TypingIndicator.rawValue {
-            tableView.reloadSections(NSIndexSet(index: Sections.TypingIndicator.rawValue), withRowAnimation: .None)
-            //let typingCellNode = tableView.nodeForRowAtIndexPath(indexPath) as! TypingCellNode
-            //typingCellNode.startAnimating()
+        if indexPath.section == Sections.LoadingIndicator.rawValue {
+            let loadingCellNode = tableView.nodeForRowAtIndexPath(indexPath) as! LoadingCellNode
+            loadingCellNode.startAnimating()
+        } else if indexPath.section == Sections.TypingIndicator.rawValue {
+            let typingCellNode = tableView.nodeForRowAtIndexPath(indexPath) as! TypingCellNode
+            typingCellNode.startAnimating()
         }
     }
     

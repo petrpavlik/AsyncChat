@@ -11,18 +11,8 @@ import AsyncDisplayKit
 
 class LoadingCellNode: ASCellNode {
     
-    private class ActivityIndicatorNode: ASDisplayNode {
-        private override func didLoad() {
-            super.didLoad()
-            
-            let activityIndicator = view as! UIActivityIndicatorView
-            activityIndicator.startAnimating()
-        }
-    }
-    
-    private let loadingNode = ActivityIndicatorNode { () -> UIView! in
+    private let loadingNode = ASDisplayNode { () -> UIView! in
         let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
-        activityIndicator.startAnimating()
         activityIndicator.hidesWhenStopped = false
         return activityIndicator
     }
@@ -39,6 +29,13 @@ class LoadingCellNode: ASCellNode {
     
     override func layout() {
         loadingNode.frame = CGRectMake((bounds.width-20)/2, (bounds.height-20)/2, 20, 20)
+    }
+    
+    func startAnimating() {
+        assert(NSThread.isMainThread())
+        
+        let activityIndicator = loadingNode.view as! UIActivityIndicatorView
+        activityIndicator.startAnimating()
     }
 
 }

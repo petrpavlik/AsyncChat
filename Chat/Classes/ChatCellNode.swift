@@ -53,7 +53,9 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
         let detector = try? NSDataDetector(types: types.rawValue)
         detector?.enumerateMatchesInString(messageText, options: [], range: NSMakeRange(0, (messageText as NSString).length)) { (result, flags, _) in
             if let URL = result?.URL {
-                attributedString.addAttribute(NSLinkAttributeName, value: URL, range: result!.range)
+                attributedString.addAttribute("aaa", value: URL, range: result!.range)
+                //attributedString.addAttribute(NSForegroundColorAttributeName, value: UIColor.redColor(), range: result!.range)
+                attributedString.addAttribute(NSUnderlineStyleAttributeName, value: NSUnderlineStyle.StyleSingle.rawValue, range: result!.range)
             }
         }
         
@@ -75,7 +77,7 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
         let detector = try? NSDataDetector(types: types.rawValue)
         detector?.enumerateMatchesInString(messageText, options: [], range: NSMakeRange(0, (messageText as NSString).length)) { (result, flags, _) in
             if let URL = result?.URL {
-                attributedString.addAttribute(NSLinkAttributeName, value: URL, range: result!.range)
+                attributedString.addAttribute("aaa", value: URL, range: result!.range)
             }
         }
         
@@ -153,6 +155,7 @@ class ChatCellNode: ASCellNode, ASTextNodeDelegate {
         
         messageTextNode.delegate = self
         messageTextNode.userInteractionEnabled = true
+        messageTextNode.linkAttributeNames = ["aaa"]
         
         dateTextNode.attributedString = NSAttributedString(string: "THU 18:19", attributes: [NSFontAttributeName: UIFont.systemFontOfSize(12), NSForegroundColorAttributeName: UIColor.grayColor()])
         

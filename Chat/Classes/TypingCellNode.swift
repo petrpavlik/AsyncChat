@@ -12,9 +12,12 @@ import AsyncDisplayKit
 class TypingCellNode: ASCellNode {
     
     func startAnimating() {
-        circleNode0.startAnimating()
-        circleNode1.startAnimating()
-        circleNode2.startAnimating()
+        
+        dispatch_async(dispatch_get_main_queue()) { [weak self] in
+            self?.circleNode0.startAnimating()
+            self?.circleNode1.startAnimating()
+            self?.circleNode2.startAnimating()
+        }
     }
     
     static private let dotImage: UIImage = {
@@ -29,7 +32,10 @@ class TypingCellNode: ASCellNode {
     private class CircleNode: ASImageNode {
         
         func startAnimating() {
-            
+            view.alpha = 1
+            UIView.animateWithDuration(0.5, delay: animationDelay, options: [.Autoreverse, .Repeat], animations: { () -> Void in
+                self.view.alpha = 0.5
+            }, completion: nil)
         }
         
         private let animationDelay: NSTimeInterval
@@ -41,18 +47,6 @@ class TypingCellNode: ASCellNode {
             super.init()
             
             image = dotImage
-        }
-        
-        private override func displayDidFinish() {
-            super.displayDidFinish()
-            
-            dispatch_async(dispatch_get_main_queue()) { [weak self] in
-                if let strongSelf = self {
-                    UIView.animateWithDuration(0.5, delay: strongSelf.animationDelay, options: [.Autoreverse, .Repeat], animations: { () -> Void in
-                        self?.view.alpha = 0.5
-                        }, completion: nil)
-                }
-            }
         }
     }
     
