@@ -9,7 +9,7 @@
 import UIKit
 import AsyncDisplayKit
 
-class TypingCellNode: ASCellNode {
+class TypingMessageCell: MessageCell {
     
     func startAnimating() {
         
@@ -50,9 +50,6 @@ class TypingCellNode: ASCellNode {
         }
     }
     
-    private let avatarImageNode = ASNetworkImageNode()
-    private let bubbleNode = ASDisplayNode()
-    
     private let circleNode0 = CircleNode(animationDelay: 0)
     private let circleNode1 = CircleNode(animationDelay: 0.2)
     private let circleNode2 = CircleNode(animationDelay: 0.4)
@@ -60,32 +57,13 @@ class TypingCellNode: ASCellNode {
     override init!() {
         super.init()
         
-        selectionStyle = .None
-        
-        addSubnode(avatarImageNode)
-        addSubnode(bubbleNode)
-        
-        avatarImageNode.layer.masksToBounds = true
-        avatarImageNode.layer.cornerRadius = 18
-        
-        bubbleNode.layer.masksToBounds = true
-        bubbleNode.layer.cornerRadius = 18
-        
-        bubbleNode.backgroundColor = UIColor(red:0.941, green:0.941, blue:0.941, alpha: 1)
-        
         addSubnode(circleNode0)
         addSubnode(circleNode1)
         addSubnode(circleNode2)
     }
     
-    override func calculateSizeThatFits(constrainedSize: CGSize) -> CGSize {
-        return CGSizeMake(constrainedSize.width, 56)
-    }
-    
     override func layout() {
-        
-        avatarImageNode.frame = CGRectMake(8, 10, 36, 36)
-        bubbleNode.frame = CGRectMake(51, 10, 10*4+3*12, 36)
+        super.layout()
         
         circleNode0.frame = CGRectMake(51+10, (bounds.height-12)/2, 12, 12)
         circleNode1.frame = CGRectMake(51+10+12+10, (bounds.height-12)/2, 12, 12)
@@ -94,5 +72,9 @@ class TypingCellNode: ASCellNode {
     
     func configure(avatarURL: NSURL) {
         avatarImageNode.setURL(avatarURL, resetToDefault: false)
+    }
+    
+    override func requiredBubbleSize(maxWidth: CGFloat) -> CGSize {
+        return CGSizeMake(76, 36)
     }
 }

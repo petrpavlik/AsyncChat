@@ -9,15 +9,44 @@
 import UIKit
 import AsyncDisplayKit
 
-class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelegate {
+class TextMessage: TextMessageProtocol {
     
-    private var messages = [
-        "三多摩地区開発による沿線人口の増加、相模原線延伸による多摩ニュータウン乗り入れ、都営地下鉄10号線（後の都営地下鉄新宿線、以下、新宿線と表記する）乗入構想により、京王線の利用客増加が見込まれ、相当数の車両を準備する必要に迫られるなか、製造費用、保守費用を抑えた新型車両として6000系が構想された[22]。新宿線建設に際してはすでに1号線（後の浅草線",
-        "AsyncDisplayKit is an iOS framework that keeps even the most complex user interfaces smooth and responsive. It was originally built to make Facebook's Paper possible, and goes hand-in-hand with pop's physics-based animations — but it's just as powerful with UIKit Dynamics and conventional app designs. www.google.com",
-        "Good morning",
-        "EMOJIS!!!! Told ya, you can't use them omb 😂😂😂😂😂😂😂",
-        "x"
+    init(text: String) {
+        self.text = text
+    }
+    
+    var avatarURL: NSURL?
+    var text: String
+}
+
+class ImageMessage: MessageProtocol {
+    
+    init(imageURL: NSURL) {
+        self.imageURL = imageURL
+    }
+    
+    var avatarURL: NSURL?
+    var imageURL: NSURL
+}
+
+class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelegate, ChatViewControllerDataSource {
+    
+    private var messages: [MessageProtocol] = [
+        TextMessage(text: "三多摩地区開発による沿線人口の増加、相模原線延伸による多摩ニュータウン乗り入れ、都営地下鉄10号線（後の都営地下鉄新宿線、以下、新宿線と表記する）乗入構想により、京王線の利用客増加が見込まれ、相当数の車両を準備する必要に迫られるなか、製造費用、保守費用を抑えた新型車両として6000系が構想された[22]。新宿線建設に際してはすでに1号線（後の浅草線"),
+        TextMessage(text: "AsyncDisplayKit is an iOS framework that keeps even the most complex user interfaces smooth and responsive. It was originally built to make Facebook's Paper possible, and goes hand-in-hand with pop's physics-based animations — but it's just as powerful with UIKit Dynamics and conventional app designs. www.google.com"),
+        TextMessage(text: "Good morning"),
+        TextMessage(text: "EMOJIS!!!! Told ya, you can't use them omb 😂😂😂😂😂😂😂"),
+        TextMessage(text: "x"),
+        ImageMessage(imageURL: NSURL(string: "https://pbs.twimg.com/media/CRtEnJpXAAAqUt7.jpg:large")!)
     ]
+    
+    func messageForIndex(index: UInt) -> MessageProtocol {
+        return messages[Int(index)]
+    }
+    
+    func numberOfMessages() -> UInt {
+        return UInt(messages.count)
+    }
     
     private let inputBar = ChatInputBar()
     private var inputBarBottomOffsetConstraint: NSLayoutConstraint!
@@ -67,6 +96,8 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        title = "Async Chat"
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardNotification:", name: UIKeyboardWillChangeFrameNotification, object: nil)
         
         
@@ -96,20 +127,32 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
     func tableView(tableView: ASTableView!, nodeForRowAtIndexPath indexPath: NSIndexPath!) -> ASCellNode! {
         
         if indexPath.section == Sections.Content.rawValue {
-            let cellNode = ChatCellNode()
-            if indexPath.row == 2 {
-                cellNode.configureOutgoingMessage(messages[indexPath.row])
-            } else {
-                cellNode.configureIncommingMessage(messages[indexPath.row], avatarURL: NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!)
+            
+            let isIncoming = indexPath.row != 2
+            
+            if let message = messageForIndex(UInt(indexPath.row)) as? TextMessage {
+                let cellNode = ChatCellNode(message: message.text, isIncomming: isIncoming)
+                if isIncoming == true {
+                    cellNode.avatarImageNode.setURL(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!, resetToDefault: true)
+                }
+                return cellNode
+            } else if let message = messageForIndex(UInt(indexPath.row)) as? ImageMessage {
+                let cellNode = ImageMessageCell(imageURL: message.imageURL, isIncomming: isIncoming)
+                if isIncoming == true {
+                    cellNode.avatarImageNode.setURL(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!, resetToDefault: true)
+                }
+                return cellNode
             }
-            return cellNode
+            
         } else if indexPath.section == Sections.LoadingIndicator.rawValue {
             return LoadingCellNode()
         } else {
-            let cellNode = TypingCellNode()
+            let cellNode = TypingMessageCell()
             cellNode.configure(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!)
             return cellNode
         }
+        
+        return nil
     }
     
     func tableView(tableView: ASTableView!, willDisplayNodeForRowAtIndexPath indexPath: NSIndexPath!) {
@@ -117,14 +160,14 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
             let loadingCellNode = tableView.nodeForRowAtIndexPath(indexPath) as! LoadingCellNode
             loadingCellNode.startAnimating()
         } else if indexPath.section == Sections.TypingIndicator.rawValue {
-            let typingCellNode = tableView.nodeForRowAtIndexPath(indexPath) as! TypingCellNode
+            let typingCellNode = tableView.nodeForRowAtIndexPath(indexPath) as! TypingMessageCell
             typingCellNode.startAnimating()
         }
     }
     
     func tableView(tableView: UITableView!, numberOfRowsInSection section: Int) -> Int {
         switch section {
-            case Sections.Content.rawValue: return 5
+            case Sections.Content.rawValue: return Int(numberOfMessages())
             case Sections.TypingIndicator.rawValue: return Int(typing == true)
             case Sections.LoadingIndicator.rawValue: return 1
             default: return 0
@@ -197,7 +240,7 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
     
     func startAddingMessages() {
         if tableView.numberOfSections > 0 {
-            messages.append("New message \(NSDate())")
+            messages.append(TextMessage(text: "New message \(NSDate())"))
             tableView.beginUpdates()
             tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: messages.count-1, inSection: Sections.Content.rawValue)], withRowAnimation: .Automatic)
             tableView.endUpdatesAnimated(false, completion: { (completed: Bool) -> Void in
