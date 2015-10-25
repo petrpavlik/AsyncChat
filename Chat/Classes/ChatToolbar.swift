@@ -11,6 +11,7 @@ import UIKit
 class ChatInputBar: UIView, UITextViewDelegate {
     
     var keyboardFrameChangedBlock: ((frame: CGRect) -> Void)?
+    var sizeUpdateRequiredBlock: (() -> Void)?
 
     private let textView: UITextView = {
        let textView = UITextView()
@@ -85,6 +86,10 @@ class ChatInputBar: UIView, UITextViewDelegate {
         UIView.animateWithDuration(0.2) { () -> Void in
             self.layoutIfNeeded()
         } 
+    }
+    
+    override func intrinsicContentSize() -> CGSize {
+        return CGSizeMake(320, 44)
     }
     
 }

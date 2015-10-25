@@ -49,7 +49,7 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
     }
     
     private let inputBar = ChatInputBar()
-    private var inputBarBottomOffsetConstraint: NSLayoutConstraint!
+    private var inputBarBottomOffset: CGFloat = 0
     
     enum Sections: Int {
         case LoadingIndicator = 0, Content, TypingIndicator
@@ -83,12 +83,7 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
         view.addSubview(tableView)
         
         view.addSubview(inputBar)
-        inputBar.translatesAutoresizingMaskIntoConstraints = false
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|[inputBar]|", options: NSLayoutFormatOptions(), metrics: nil, views: ["inputBar": inputBar]))
-        
-        let heightConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:[inputBar]|", options: NSLayoutFormatOptions(), metrics: nil, views: ["inputBar": inputBar])
-        inputBarBottomOffsetConstraint = heightConstraints.first
-        view.addConstraints(heightConstraints)
+        inputBar.frame = CGRectMake(0, 0, inputBar.intrinsicContentSize().width, inputBar.intrinsicContentSize().height)
     }
     
     override func viewDidLoad() {
@@ -107,9 +102,11 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
         
         inputBar.keyboardFrameChangedBlock = { [weak self] (frame: CGRect) in
             
-            self?.inputBarBottomOffsetConstraint.constant = self!.view.bounds.height - frame.origin.y
-            self?.view.layoutIfNeeded()
-            self?.reactToKeyboardFrameChange()
+            self?.inputBarBottomOffset = self!.view.bounds.height - frame.origin.y
+            self?.inputBar.pspdf_performWithoutTriggeringSetNeedsLayout({ () -> Void in
+                self!.inputBar.frame = CGRectMake(0, self!.view.bounds.height-self!.inputBar.intrinsicContentSize().height-self!.inputBarBottomOffset, self!.view.bounds.width, self!.inputBar.intrinsicContentSize().height)
+                self!.reactToKeyboardFrameChange()
+            })
         }
         
         let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
@@ -125,6 +122,7 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
         super.viewDidLayoutSubviews()
         
         tableView.frame = CGRectMake(0, topLayoutGuide.length, view.bounds.width, view.bounds.height - topLayoutGuide.length)
+        inputBar.frame = CGRectMake(0, view.bounds.height-self.inputBar.intrinsicContentSize().height-inputBarBottomOffset, view.bounds.width, inputBar.intrinsicContentSize().height)
     }
     
     // MARK:
@@ -206,7 +204,7 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
     }
     
     private func reactToKeyboardFrameChange() {
-        tableView.contentInset = UIEdgeInsetsMake(0, 0, self.inputBarBottomOffsetConstraint.constant+self.inputBar.frame.height, 0)
+        tableView.contentInset = UIEdgeInsetsMake(0, 0, inputBarBottomOffset+self.inputBar.frame.height, 0)
         tableView.scrollIndicatorInsets = tableView.contentInset
     }
     
@@ -220,19 +218,21 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
             
             if UIScreen.mainScreen().bounds.height - endFrame!.origin.y > 0 {
-                self.inputBarBottomOffsetConstraint.constant = endFrame!.size.height
+                inputBarBottomOffset = endFrame!.size.height
             } else {
-                self.inputBarBottomOffsetConstraint.constant = 0
+                inputBarBottomOffset = 0
             }
             
-            UIView.animateWithDuration(duration,
-                delay: NSTimeInterval(0),
-                options: animationCurve,
-                animations: {
-                    self.view.layoutIfNeeded()
-                    self.reactToKeyboardFrameChange()
-                },
-                completion: nil)
+            self.inputBar.pspdf_performWithoutTriggeringSetNeedsLayout({ () -> Void in
+                UIView.animateWithDuration(duration,
+                    delay: NSTimeInterval(0),
+                    options: animationCurve,
+                    animations: {
+                        self.inputBar.frame = CGRectMake(0, self.view.bounds.height-self.inputBar.intrinsicContentSize().height-self.inputBarBottomOffset, self.view.bounds.width, self.inputBar.intrinsicContentSize().height)
+                        self.reactToKeyboardFrameChange()
+                    },
+                    completion: nil)
+            })
         }
     }
     
