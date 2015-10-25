@@ -77,10 +77,9 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
         
         tableView.asyncDataSource = self
         tableView.asyncDelegate = self
-        tableView.frame = view.bounds
-        tableView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         tableView.separatorStyle = .None
         tableView.keyboardDismissMode = .Interactive
+        tableView.frame = view.bounds
         view.addSubview(tableView)
         
         view.addSubview(inputBar)
@@ -120,6 +119,12 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
         
         //startSwitchingTypingState()
         //startAddingMessages()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        tableView.frame = CGRectMake(0, topLayoutGuide.length, view.bounds.width, view.bounds.height - topLayoutGuide.length)
     }
     
     // MARK:
@@ -206,14 +211,20 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
     }
     
     func keyboardNotification(notification: NSNotification) {
-        print("frame changed")
         if let userInfo = notification.userInfo {
             let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.CGRectValue()
+            print("frame changed \(endFrame)")
             let duration:NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
             let animationCurveRawNSN = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber
             let animationCurveRaw = animationCurveRawNSN?.unsignedLongValue ?? UIViewAnimationOptions.CurveEaseInOut.rawValue
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
-            self.inputBarBottomOffsetConstraint.constant = endFrame?.size.height ?? 0.0
+            
+            if UIScreen.mainScreen().bounds.height - endFrame!.origin.y > 0 {
+                self.inputBarBottomOffsetConstraint.constant = endFrame!.size.height
+            } else {
+                self.inputBarBottomOffsetConstraint.constant = 0
+            }
+            
             UIView.animateWithDuration(duration,
                 delay: NSTimeInterval(0),
                 options: animationCurve,

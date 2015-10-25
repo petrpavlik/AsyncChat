@@ -32,6 +32,8 @@ class ChatInputBar: UIView, UITextViewDelegate {
         addSubview(textView)
         addSubview(sendButton)
         
+        backgroundColor = .whiteColor()
+        
         let separatorView = UIView()
         separatorView.backgroundColor = UIColor(red:0.741, green:0.741, blue:0.741, alpha: 1)
         separatorView.translatesAutoresizingMaskIntoConstraints = false
@@ -53,7 +55,7 @@ class ChatInputBar: UIView, UITextViewDelegate {
         let bindings = ["textView": textView, "sendButton": sendButton, "separatorView": separatorView]
         addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|[separatorView]|", options: NSLayoutFormatOptions(), metrics: nil, views: bindings))
         addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|-[textView]-[sendButton]-|", options: NSLayoutFormatOptions(), metrics: nil, views: bindings))
-        addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[separatorView(1)][textView]|", options: NSLayoutFormatOptions(), metrics: nil, views: bindings))
+        addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[separatorView(0.5)][textView]|", options: NSLayoutFormatOptions(), metrics: nil, views: bindings))
         addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|->=0-[sendButton(44)]|", options: NSLayoutFormatOptions(), metrics: nil, views: bindings))
         
         textView.delegate = self

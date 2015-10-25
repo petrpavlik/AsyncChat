@@ -20,6 +20,7 @@
 		EFAFCEE51BB6EE3900E91371 /* ChatUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAFCEE41BB6EE3900E91371 /* ChatUITests.swift */; };
 		EFAFCEF31BB6EEE300E91371 /* ChatToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAFCEF21BB6EEE300E91371 /* ChatToolbar.swift */; };
 		EFBB35DB1BDCFD2200BD413D /* ImageMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFBB35DA1BDCFD2200BD413D /* ImageMessageCell.swift */; };
+		EFBB35DF1BDD222500BD413D /* UIView+PSPDFKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EFBB35DE1BDD222500BD413D /* UIView+PSPDFKitAdditions.m */; };
 		EFF273721BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF273711BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift */; };
 		EFF676071BDACB3A0041AEAA /* MessageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF676061BDACB3A0041AEAA /* MessageProtocol.swift */; };
 		EFF676091BDACCBC0041AEAA /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF676081BDACCBC0041AEAA /* ChatViewController.swift */; };
@@ -66,6 +67,8 @@
 		EFAFCEE61BB6EE3900E91371 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EFAFCEF21BB6EEE300E91371 /* ChatToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ChatToolbar.swift; path = Classes/ChatToolbar.swift; sourceTree = "<group>"; };
 		EFBB35DA1BDCFD2200BD413D /* ImageMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ImageMessageCell.swift; path = Classes/ImageMessageCell.swift; sourceTree = "<group>"; };
+		EFBB35DD1BDD222500BD413D /* UIView+PSPDFKitAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIView+PSPDFKitAdditions.h"; path = "Vendor/UIView+PSPDFKitAdditions.h"; sourceTree = SOURCE_ROOT; };
+		EFBB35DE1BDD222500BD413D /* UIView+PSPDFKitAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIView+PSPDFKitAdditions.m"; path = "Vendor/UIView+PSPDFKitAdditions.m"; sourceTree = SOURCE_ROOT; };
 		EFF273711BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KeyboardFrameDetectorInputView.swift; path = Classes/KeyboardFrameDetectorInputView.swift; sourceTree = "<group>"; };
 		EFF676061BDACB3A0041AEAA /* MessageProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MessageProtocol.swift; path = Classes/MessageProtocol.swift; sourceTree = "<group>"; };
 		EFF676081BDACCBC0041AEAA /* ChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ChatViewController.swift; path = Classes/ChatViewController.swift; sourceTree = "<group>"; };
@@ -154,6 +157,7 @@
 		EFAFCEC31BB6EE3900E91371 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
+				EFBB35DC1BDD220E00BD413D /* Vendor */,
 				EF1B72891BD524B200657358 /* Cells */,
 				EF1B72881BD5249E00657358 /* Toolbar */,
 				EFAFCEC41BB6EE3900E91371 /* AppDelegate.swift */,
@@ -184,6 +188,15 @@
 				EFAFCEE61BB6EE3900E91371 /* Info.plist */,
 			);
 			path = ChatUITests;
+			sourceTree = "<group>";
+		};
+		EFBB35DC1BDD220E00BD413D /* Vendor */ = {
+			isa = PBXGroup;
+			children = (
+				EFBB35DD1BDD222500BD413D /* UIView+PSPDFKitAdditions.h */,
+				EFBB35DE1BDD222500BD413D /* UIView+PSPDFKitAdditions.m */,
+			);
+			name = Vendor;
 			sourceTree = "<group>";
 		};
 		F6C8235FB062EE12A875F0DB /* Frameworks */ = {
@@ -377,6 +390,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EF14D32F1BBD6BE500AE5D62 /* TypingMessageCell.swift in Sources */,
+				EFBB35DF1BDD222500BD413D /* UIView+PSPDFKitAdditions.m in Sources */,
 				EFF6760B1BDB80680041AEAA /* MessageCell.swift in Sources */,
 				EFAFCEC71BB6EE3900E91371 /* ViewController.swift in Sources */,
 				EFF273721BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift in Sources */,
