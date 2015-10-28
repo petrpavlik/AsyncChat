@@ -29,7 +29,7 @@ class ImageMessage: MessageProtocol {
     var imageURL: NSURL
 }
 
-class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelegate, ChatViewControllerDataSource {
+class ViewController: ChatViewController, ChatViewControllerDataSource {
     
     private var messages: [MessageProtocol] = [
         TextMessage(text: "三多摩地区開発による沿線人口の増加、相模原線延伸による多摩ニュータウン乗り入れ、都営地下鉄10号線（後の都営地下鉄新宿線、以下、新宿線と表記する）乗入構想により、京王線の利用客増加が見込まれ、相当数の車両を準備する必要に迫られるなか、製造費用、保守費用を抑えた新型車両として6000系が構想された[22]。新宿線建設に際してはすでに1号線（後の浅草線"),
@@ -40,8 +40,25 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
         ImageMessage(imageURL: NSURL(string: "https://pbs.twimg.com/media/CRtEnJpXAAAqUt7.jpg:large")!)
     ]
     
-    func messageForIndex(index: UInt) -> MessageProtocol {
-        return messages[Int(index)]
+    func messageCellForIndex(index: UInt) -> MessageCell {
+        
+        let isIncoming = index != 2
+        
+        if let message = messages[Int(index)] as? TextMessage {
+            let cellNode = ChatCellNode(message: message.text, isIncomming: isIncoming)
+            if isIncoming == true {
+                cellNode.avatarImageNode.setURL(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!, resetToDefault: true)
+            }
+            return cellNode
+        } else if let message = messages[Int(index)] as? ImageMessage {
+            let cellNode = ImageMessageCell(imageURL: message.imageURL, isIncomming: isIncoming)
+            if isIncoming == true {
+                cellNode.avatarImageNode.setURL(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!, resetToDefault: true)
+            }
+            return cellNode
+        }
+        
+        return MessageCell()
     }
     
     func numberOfMessages() -> UInt {
@@ -51,36 +68,10 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
     private let inputBar = ChatInputBar()
     private var inputBarBottomOffset: CGFloat = 0
     
-    enum Sections: Int {
-        case LoadingIndicator = 0, Content, TypingIndicator
-    }
-
-    let tableView = ASTableView(frame: CGRectZero, style: .Plain)
-    
-    var typing = false {
-        didSet {
-            if tableView.numberOfSections > 0 {
-                tableView.beginUpdates()
-                tableView.reloadSections(NSIndexSet(index: Sections.TypingIndicator.rawValue), withRowAnimation: .Automatic)
-                tableView.endUpdatesAnimated(!typing, completion: { (completed: Bool) -> Void in
-                    assert(NSThread.isMainThread())
-                    if self.typing == true {
-                        self.scrollToBottom(true)
-                    }
-                })
-            }
-        }
-    }
-    
     override func loadView() {
         super.loadView()
         
-        tableView.asyncDataSource = self
-        tableView.asyncDelegate = self
-        tableView.separatorStyle = .None
-        tableView.keyboardDismissMode = .Interactive
-        tableView.frame = view.bounds
-        view.addSubview(tableView)
+        dataSource = self
         
         view.addSubview(inputBar)
         inputBar.frame = CGRectMake(0, 0, inputBar.intrinsicContentSize().width, inputBar.intrinsicContentSize().height)
@@ -121,87 +112,12 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        tableView.frame = CGRectMake(0, topLayoutGuide.length, view.bounds.width, view.bounds.height - topLayoutGuide.length)
         inputBar.frame = CGRectMake(0, view.bounds.height-self.inputBar.intrinsicContentSize().height-inputBarBottomOffset, view.bounds.width, inputBar.intrinsicContentSize().height)
     }
     
     // MARK:
     
-    func tableView(tableView: ASTableView!, nodeForRowAtIndexPath indexPath: NSIndexPath!) -> ASCellNode! {
-        
-        if indexPath.section == Sections.Content.rawValue {
-            
-            let isIncoming = indexPath.row != 2
-            
-            if let message = messageForIndex(UInt(indexPath.row)) as? TextMessage {
-                let cellNode = ChatCellNode(message: message.text, isIncomming: isIncoming)
-                if isIncoming == true {
-                    cellNode.avatarImageNode.setURL(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!, resetToDefault: true)
-                }
-                return cellNode
-            } else if let message = messageForIndex(UInt(indexPath.row)) as? ImageMessage {
-                let cellNode = ImageMessageCell(imageURL: message.imageURL, isIncomming: isIncoming)
-                if isIncoming == true {
-                    cellNode.avatarImageNode.setURL(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!, resetToDefault: true)
-                }
-                return cellNode
-            }
-            
-        } else if indexPath.section == Sections.LoadingIndicator.rawValue {
-            return LoadingCellNode()
-        } else {
-            let cellNode = TypingMessageCell()
-            cellNode.configure(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!)
-            return cellNode
-        }
-        
-        return nil
-    }
     
-    func tableView(tableView: ASTableView!, willDisplayNodeForRowAtIndexPath indexPath: NSIndexPath!) {
-        if indexPath.section == Sections.LoadingIndicator.rawValue {
-            let loadingCellNode = tableView.nodeForRowAtIndexPath(indexPath) as! LoadingCellNode
-            loadingCellNode.startAnimating()
-        } else if indexPath.section == Sections.TypingIndicator.rawValue {
-            let typingCellNode = tableView.nodeForRowAtIndexPath(indexPath) as! TypingMessageCell
-            typingCellNode.startAnimating()
-        }
-    }
-    
-    func tableView(tableView: UITableView!, numberOfRowsInSection section: Int) -> Int {
-        switch section {
-            case Sections.Content.rawValue: return Int(numberOfMessages())
-            case Sections.TypingIndicator.rawValue: return Int(typing == true)
-            case Sections.LoadingIndicator.rawValue: return 1
-            default: return 0
-        }
-    }
-    
-    func numberOfSectionsInTableView(tableView: UITableView!) -> Int {
-        return 3
-    }
-    
-    //MARK: 
-    
-    private func scrollToBottom(animated: Bool) {
-        
-        if tableView.numberOfSections == 0 {
-            return
-        }
-        
-        let indexPath: NSIndexPath!
-        if tableView.numberOfRowsInSection(Sections.TypingIndicator.rawValue) > 0 {
-            indexPath = NSIndexPath(forRow: 0, inSection: Sections.TypingIndicator.rawValue)
-        } else if tableView.numberOfRowsInSection(Sections.Content.rawValue) > 0 {
-            indexPath = NSIndexPath(forRow: messages.count-1, inSection: Sections.Content.rawValue)
-        } else {
-            return
-        }
-        
-        tableView.scrollToRowAtIndexPath(indexPath, atScrollPosition: .Bottom, animated: animated)
-        
-        //tableView.setContentOffset(CGPointMake(0, tableView.contentSize.height - tableView.bounds.height + tableView.contentInset.bottom), animated: true)
-    }
     
     private func reactToKeyboardFrameChange() {
         tableView.contentInset = UIEdgeInsetsMake(0, 0, inputBarBottomOffset+self.inputBar.frame.height, 0)
@@ -238,7 +154,7 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
     
     //MARK: Debug
     
-    func startSwitchingTypingState() {
+    /*func startSwitchingTypingState() {
         typing = !typing
         if typing == true {
             scrollToBottom(true)
@@ -263,7 +179,7 @@ class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelega
         dispatch_after(delayTime, dispatch_get_main_queue()) { [weak self] in
             self?.startAddingMessages()
         }
-    }
+    }*/
     
 }
 

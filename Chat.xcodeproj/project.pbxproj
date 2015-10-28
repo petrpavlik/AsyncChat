@@ -115,7 +115,6 @@
 			children = (
 				EFAFCEF21BB6EEE300E91371 /* ChatToolbar.swift */,
 				EFF273711BD422D30034D3CD /* KeyboardFrameDetectorInputView.swift */,
-				EFF676081BDACCBC0041AEAA /* ChatViewController.swift */,
 			);
 			name = Toolbar;
 			sourceTree = "<group>";
@@ -162,6 +161,7 @@
 				EF1B72881BD5249E00657358 /* Toolbar */,
 				EFAFCEC41BB6EE3900E91371 /* AppDelegate.swift */,
 				EFAFCEC61BB6EE3900E91371 /* ViewController.swift */,
+				EFF676081BDACCBC0041AEAA /* ChatViewController.swift */,
 				EFAFCEC81BB6EE3900E91371 /* Main.storyboard */,
 				EFAFCECB1BB6EE3900E91371 /* Assets.xcassets */,
 				EFAFCECD1BB6EE3900E91371 /* LaunchScreen.storyboard */,
