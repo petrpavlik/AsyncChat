@@ -15,7 +15,8 @@ class MessageCell: ASCellNode {
     // MARK: Layout constants
     private let topVerticalPadding: CGFloat = 10.0
     private let bottomVerticalPadding: CGFloat = 10.0
-    private let leftHorizontalPadding: CGFloat = 8.0
+    private let leadingHorizontalPadding: CGFloat = 8.0
+    private let trailingHorizontalPadding: CGFloat = 16.0
     private let avatarImageSize = CGSizeMake(36, 36)
     private let avatarBubbleHorizontalDistance: CGFloat = 8.0
     private let bubbleTextMargin: CGFloat = 10
@@ -66,6 +67,9 @@ class MessageCell: ASCellNode {
         addSubnode(avatarImageNode)
         addSubnode(bubbleNode)
         
+        avatarImageNode.placeholderColor = UIColor.grayColor()
+        avatarImageNode.placeholderEnabled = true
+        
         bubbleNode.tintColor = incomingMessageColorNormal
         
         avatarImageNode.imageModificationBlock = { image in
@@ -76,14 +80,15 @@ class MessageCell: ASCellNode {
     }
     
     override func calculateSizeThatFits(constrainedSize: CGSize) -> CGSize {
-        return CGSizeMake(constrainedSize.width, requiredBubbleSize(256).height + topVerticalPadding + bottomVerticalPadding)
+        
+        return CGSizeMake(constrainedSize.width, requiredBubbleSize(maxBubbleWidth(constrainedSize.width)).height + topVerticalPadding + bottomVerticalPadding)
     }
     
     override func layout() {
         
         super.layout()
         
-        var bubbleSize = requiredBubbleSize(256)
+        var bubbleSize = requiredBubbleSize(maxBubbleWidth(frame.width))
         bubbleSize.width = max(40, bubbleSize.width)
         
         if isIncommingMessage == false {
@@ -92,11 +97,15 @@ class MessageCell: ASCellNode {
             
         } else {
             
-            avatarImageNode.frame = CGRectMake(leftHorizontalPadding, topVerticalPadding, avatarImageSize.width, avatarImageSize.height)
+            avatarImageNode.frame = CGRectMake(leadingHorizontalPadding, topVerticalPadding, avatarImageSize.width, avatarImageSize.height)
             
-            bubbleNode.frame = CGRectMake(leftHorizontalPadding+avatarImageSize.width+avatarBubbleHorizontalDistance, topVerticalPadding, bubbleSize.width, bubbleSize.height)
+            bubbleNode.frame = CGRectMake(leadingHorizontalPadding+avatarImageSize.width+avatarBubbleHorizontalDistance, topVerticalPadding, bubbleSize.width, bubbleSize.height)
             
         }
+    }
+    
+    private func maxBubbleWidth(cellWidth: CGFloat) -> CGFloat {
+        return cellWidth - leadingHorizontalPadding - avatarImageSize.width - avatarBubbleHorizontalDistance - trailingHorizontalPadding
     }
 
 

@@ -14,6 +14,7 @@ protocol ChatViewControllerDataSource: class {
     func numberOfMessages() -> UInt
 }
 
+
 class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDelegate {
     
     weak var dataSource: ChatViewControllerDataSource!
@@ -23,10 +24,12 @@ class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDe
     }
     
     enum Avatar {
+        case NoAvatar
         case URL(NSURL)
-        case image(UIImage)
+        case Image(UIImage)
     }
-    var otherUserAvatar: Avatar!
+    
+    var otherUserAvatar = Avatar.NoAvatar
     
     let tableView = ASTableView(frame: CGRectZero, style: .Plain)
     
@@ -109,11 +112,16 @@ class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDe
             return LoadingCellNode()
         } else {
             let cellNode = TypingMessageCell()
-            /*switch(otherUserAvatar) {
-                case .URL(let u): print("a")
-                case .image(let u): print("a")
-            }*/
-            cellNode.configure(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!)
+            
+            switch otherUserAvatar {
+                case .NoAvatar:
+                    cellNode.avatarImageNode.image = nil
+                case let .URL(URL):
+                    cellNode.avatarImageNode.setURL(URL, resetToDefault: true)
+                case let .Image(image):
+                    cellNode.avatarImageNode.image = image
+            }
+            
             return cellNode
         }
     }

@@ -83,6 +83,8 @@ class ViewController: ChatViewController, ChatViewControllerDataSource {
         
         title = "Async Chat"
         
+        otherUserAvatar = .URL(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!)
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardNotification:", name: UIKeyboardWillChangeFrameNotification, object: nil)
         
         
