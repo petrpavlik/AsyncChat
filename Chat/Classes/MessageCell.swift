@@ -20,6 +20,7 @@ class MessageCell: ASCellNode {
     private let avatarImageSize = CGSizeMake(36, 36)
     private let avatarBubbleHorizontalDistance: CGFloat = 8.0
     private let bubbleTextMargin: CGFloat = 10
+    private let headerTextHeight: CGFloat = 20
     
     private static let bubbleImage: UIImage = {
         
@@ -42,6 +43,25 @@ class MessageCell: ASCellNode {
     let bubbleNode = ASDisplayNode { () -> UIView! in
         let imageView = UIImageView(image: bubbleImage)
         return imageView
+    }
+    
+    private let headerTextNode = ASTextNode()
+    
+    var headerText: String? {
+        didSet {
+            if headerText?.characters.count > 0 {
+                headerTextNode.hidden = false
+                
+                let paragraphStyle = NSMutableParagraphStyle()
+                paragraphStyle.alignment = .Center
+                paragraphStyle.lineHeightMultiple = 1.4
+                
+                headerTextNode.attributedString = NSAttributedString(string: headerText!, attributes: [NSParagraphStyleAttributeName: paragraphStyle, NSForegroundColorAttributeName: UIColor.grayColor()])
+            } else {
+                headerTextNode.hidden = true
+                headerTextNode.attributedString = nil
+            }
+        }
     }
     
     var incomingMessageColorNormal = UIColor(red:0.941, green:0.941, blue:0.941, alpha: 1)
@@ -67,9 +87,12 @@ class MessageCell: ASCellNode {
         
         addSubnode(avatarImageNode)
         addSubnode(bubbleNode)
+        addSubnode(headerTextNode)
         
         avatarImageNode.placeholderColor = avatarPlaceholderColor
         avatarImageNode.placeholderEnabled = true
+        
+        
         
         bubbleNode.tintColor = incomingMessageColorNormal
         
@@ -82,7 +105,9 @@ class MessageCell: ASCellNode {
     
     override func calculateSizeThatFits(constrainedSize: CGSize) -> CGSize {
         
-        return CGSizeMake(constrainedSize.width, requiredBubbleSize(maxBubbleWidth(constrainedSize.width)).height + topVerticalPadding + bottomVerticalPadding)
+        let headerHeight = headerText?.characters.count > 0 ? headerTextHeight : 0
+        
+        return CGSizeMake(constrainedSize.width, requiredBubbleSize(maxBubbleWidth(constrainedSize.width)).height + topVerticalPadding + bottomVerticalPadding + headerHeight)
     }
     
     override func layout() {
@@ -92,16 +117,22 @@ class MessageCell: ASCellNode {
         var bubbleSize = requiredBubbleSize(maxBubbleWidth(frame.width))
         bubbleSize.width = max(40, bubbleSize.width)
         
+        let headerHeight = headerText?.characters.count > 0 ? headerTextHeight : 0
+        
         if isIncommingMessage == false {
             
-            bubbleNode.frame = CGRectMake(bounds.width - (26 + bubbleSize.width), topVerticalPadding, bubbleSize.width, bubbleSize.height)
+            bubbleNode.frame = CGRectMake(bounds.width - (26 + bubbleSize.width), topVerticalPadding + headerHeight, bubbleSize.width, bubbleSize.height)
             
         } else {
             
-            avatarImageNode.frame = CGRectMake(leadingHorizontalPadding, topVerticalPadding, avatarImageSize.width, avatarImageSize.height)
+            avatarImageNode.frame = CGRectMake(leadingHorizontalPadding, topVerticalPadding + headerHeight, avatarImageSize.width, avatarImageSize.height)
             
-            bubbleNode.frame = CGRectMake(leadingHorizontalPadding+avatarImageSize.width+avatarBubbleHorizontalDistance, topVerticalPadding, bubbleSize.width, bubbleSize.height)
+            bubbleNode.frame = CGRectMake(leadingHorizontalPadding+avatarImageSize.width+avatarBubbleHorizontalDistance, topVerticalPadding + headerHeight, bubbleSize.width, bubbleSize.height)
             
+        }
+        
+        if headerHeight > 0 {
+            headerTextNode.frame = CGRectMake(leadingHorizontalPadding, 0, bounds.width-2*leadingHorizontalPadding, headerTextHeight)
         }
     }
     

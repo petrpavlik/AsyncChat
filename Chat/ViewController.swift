@@ -48,12 +48,14 @@ class ViewController: ChatViewController, ChatViewControllerDataSource {
             let cellNode = ChatCellNode(message: message.text, isIncomming: isIncoming)
             if isIncoming == true {
                 cellNode.avatarImageNode.setURL(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!, resetToDefault: true)
+                cellNode.headerText = index % 3 == 0 ? "5 minutes ago" : nil
             }
             return cellNode
         } else if let message = messages[Int(index)] as? ImageMessage {
             let cellNode = ImageMessageCell(imageURL: message.imageURL, isIncomming: isIncoming)
             if isIncoming == true {
                 cellNode.avatarImageNode.setURL(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!, resetToDefault: true)
+                cellNode.headerText = index % 3 == 0 ? "5 minutes ago" : nil
             }
             return cellNode
         }
