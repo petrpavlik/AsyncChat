@@ -22,6 +22,12 @@ class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDe
         case LoadingIndicator = 0, Content, TypingIndicator
     }
     
+    enum Avatar {
+        case URL(NSURL)
+        case image(UIImage)
+    }
+    var otherUserAvatar: Avatar!
+    
     let tableView = ASTableView(frame: CGRectZero, style: .Plain)
     
     var typing = false {
@@ -103,6 +109,10 @@ class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDe
             return LoadingCellNode()
         } else {
             let cellNode = TypingMessageCell()
+            /*switch(otherUserAvatar) {
+                case .URL(let u): print("a")
+                case .image(let u): print("a")
+            }*/
             cellNode.configure(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!)
             return cellNode
         }
