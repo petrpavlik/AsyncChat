@@ -11,3 +11,6 @@ Chat UI using Facebook's [AsyncDisplayKit](http://asyncdisplaykit.org)
   
 ## Status
 This thing is still under heavy development, but you can totally check it out as a real-world example of [AsyncDisplayKit](http://asyncdisplaykit.org)
+
+## Contact
+[My twitter](https://twitter.com/ptrpavlik)
