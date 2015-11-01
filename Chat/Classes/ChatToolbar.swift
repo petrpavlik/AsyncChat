@@ -12,6 +12,8 @@ class ChatInputBar: UIView, UITextViewDelegate {
     
     var keyboardFrameChangedBlock: ((frame: CGRect) -> Void)?
     var sizeUpdateRequiredBlock: (() -> Void)?
+    
+    private var requiredHeight: CGFloat = 44
 
     private let textView: UITextView = {
        let textView = UITextView()
@@ -25,8 +27,6 @@ class ChatInputBar: UIView, UITextViewDelegate {
         button.setTitle(NSLocalizedString("Send", comment: ""), forState: .Normal)
         return button
     }()
-    
-    private var textViewHeightConstraints = [NSLayoutConstraint]()
     
     private func configureView() {
         
@@ -75,21 +75,17 @@ class ChatInputBar: UIView, UITextViewDelegate {
         
         let requiredSize = textView.attributedText.boundingRectWithSize(CGSizeMake(textView.frame.width, 1000), options: [NSStringDrawingOptions.UsesLineFragmentOrigin, NSStringDrawingOptions.UsesFontLeading], context: nil).size
         
-        let requiredHeight = max(44, requiredSize.height)
+        if requiredHeight == max(44, requiredSize.height) {
+            return
+        }
         
-        print("\(requiredHeight)")
+        requiredHeight = max(44, requiredSize.height)
         
-        removeConstraints(textViewHeightConstraints)
-        textViewHeightConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:[textView(height)]", options: NSLayoutFormatOptions(), metrics: ["height": requiredHeight], views: ["textView": textView])
-        addConstraints(textViewHeightConstraints)
-        
-        UIView.animateWithDuration(0.2) { () -> Void in
-            self.layoutIfNeeded()
-        } 
+        sizeUpdateRequiredBlock?()
     }
     
     override func intrinsicContentSize() -> CGSize {
-        return CGSizeMake(320, 44)
+        return CGSizeMake(320, requiredHeight)
     }
     
 }

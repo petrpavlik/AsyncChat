@@ -14,6 +14,10 @@ protocol ChatViewControllerDataSource: class {
     func numberOfMessages() -> UInt
 }
 
+/*protocol ChatViewControllerDelegate: class {
+    func viewControllerSendMessageButtonPressed(
+}*/
+
 
 class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDelegate {
     

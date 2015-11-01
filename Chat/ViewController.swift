@@ -104,6 +104,14 @@ class ViewController: ChatViewController, ChatViewControllerDataSource {
             })
         }
         
+        inputBar.sizeUpdateRequiredBlock = { [unowned self] in
+            UIView.animateWithDuration(0.2, animations: { () -> Void in
+                    self.inputBar.frame = CGRectMake(0, self.view.bounds.height-self.inputBar.intrinsicContentSize().height-self.inputBarBottomOffset, self.view.bounds.width, self.inputBar.intrinsicContentSize().height)
+                }, completion: { (completed) -> Void in
+                    self.reactToKeyboardFrameChange()
+            })
+        }
+        
         let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
         dispatch_after(delayTime, dispatch_get_main_queue()) { [weak self] in
             self?.typing = true
