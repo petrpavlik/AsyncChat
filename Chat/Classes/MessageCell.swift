@@ -48,6 +48,7 @@ class MessageCell: ASCellNode {
     var incomingMessageColorSelected = UIColor(red:0.831, green:0.824, blue:0.827, alpha: 1)
     var outgoingMessageColorNormal = UIColor(red:0.004, green:0.518, blue:1.000, alpha: 1)
     var outgoingMessageColorSelected = UIColor(red:0.075, green:0.467, blue:0.976, alpha: 1)
+    var avatarPlaceholderColor = UIColor.grayColor()
     
     // MARK:
     
@@ -67,7 +68,7 @@ class MessageCell: ASCellNode {
         addSubnode(avatarImageNode)
         addSubnode(bubbleNode)
         
-        avatarImageNode.placeholderColor = UIColor.grayColor()
+        avatarImageNode.placeholderColor = avatarPlaceholderColor
         avatarImageNode.placeholderEnabled = true
         
         bubbleNode.tintColor = incomingMessageColorNormal
