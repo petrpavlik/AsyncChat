@@ -8,10 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASDealloc2MainObject.h>
+#import <AsyncDisplayKit/ASDimension.h>
 #import "ASFlowLayoutController.h"
 
 @class ASCellNode;
 @class ASDataController;
+
+FOUNDATION_EXPORT NSString * const ASDataControllerRowNodeKind;
 
 typedef NSUInteger ASDataControllerAnimationOptions;
 
@@ -27,9 +30,9 @@ typedef NSUInteger ASDataControllerAnimationOptions;
 - (ASCellNode *)dataController:(ASDataController *)dataController nodeAtIndexPath:(NSIndexPath *)indexPath;
 
 /**
- The constrained size for layout.
+ The constrained size range for layout.
  */
-- (CGSize)dataController:(ASDataController *)dataController constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath;
+- (ASSizeRange)dataController:(ASDataController *)dataController constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath;
 
 /**
  Fetch the number of rows in specific section.
@@ -39,7 +42,7 @@ typedef NSUInteger ASDataControllerAnimationOptions;
 /**
  Fetch the number of sections.
  */
-- (NSUInteger)dataControllerNumberOfSections:(ASDataController *)dataController;
+- (NSUInteger)numberOfSectionsInDataController:(ASDataController *)dataController;
 
 /**
  Lock the data source for data fetching.
@@ -89,13 +92,12 @@ typedef NSUInteger ASDataControllerAnimationOptions;
 
 @end
 
-
 /**
  * Controller to layout data in background, and managed data updating.
  *
  * All operations are asynchronous and thread safe. You can call it from background thread (it is recommendated) and the data
  * will be updated asynchronously. The dataSource must be updated to reflect the changes before these methods has been called.
- * For each data updatin, the corresponding methods in delegate will be called.
+ * For each data updating, the corresponding methods in delegate will be called.
  */
 @protocol ASFlowLayoutControllerDataSource;
 @interface ASDataController : ASDealloc2MainObject <ASFlowLayoutControllerDataSource>
@@ -154,9 +156,19 @@ typedef NSUInteger ASDataControllerAnimationOptions;
 
 - (void)reloadRowsAtIndexPaths:(NSArray *)indexPaths withAnimationOptions:(ASDataControllerAnimationOptions)animationOptions;
 
+/**
+ * Re-measures all loaded nodes in the backing store.
+ * 
+ * @discussion Used to respond to a change in size of the containing view
+ * (e.g. ASTableView or ASCollectionView after an orientation change).
+ */
+- (void)relayoutAllNodes;
+
 - (void)moveRowAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath withAnimationOptions:(ASDataControllerAnimationOptions)animationOptions;
 
 - (void)reloadDataWithAnimationOptions:(ASDataControllerAnimationOptions)animationOptions completion:(void (^)())completion;
+
+- (void)reloadDataImmediatelyWithAnimationOptions:(ASDataControllerAnimationOptions)animationOptions;
 
 /** @name Data Querying */
 
@@ -166,8 +178,13 @@ typedef NSUInteger ASDataControllerAnimationOptions;
 
 - (ASCellNode *)nodeAtIndexPath:(NSIndexPath *)indexPath;
 
+- (NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode;
+
 - (NSArray *)nodesAtIndexPaths:(NSArray *)indexPaths;
 
-- (NSArray *)completedNodes;  // This provides efficient access to the entire _completedNodes multidimensional array.
+/**
+ * Direct access to the nodes that have completed calculation and layout
+ */
+- (NSArray *)completedNodes;
 
 @end

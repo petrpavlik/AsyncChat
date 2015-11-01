@@ -17,17 +17,18 @@
 #import "ASDisplayNode.h"
 #import "ASSentinel.h"
 #import "ASThread.h"
+#import "ASLayoutOptions.h"
 
 BOOL ASDisplayNodeSubclassOverridesSelector(Class subclass, SEL selector);
-CGFloat ASDisplayNodeScreenScale();
-void ASDisplayNodePerformBlockOnMainThread(void (^block)());
+void ASDisplayNodeRespectThreadAffinityOfNode(ASDisplayNode *node, void (^block)());
 
 typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides) {
   ASDisplayNodeMethodOverrideNone = 0,
-  ASDisplayNodeMethodOverrideTouchesBegan     = 1 << 0,
-  ASDisplayNodeMethodOverrideTouchesCancelled = 1 << 1,
-  ASDisplayNodeMethodOverrideTouchesEnded     = 1 << 2,
-  ASDisplayNodeMethodOverrideTouchesMoved     = 1 << 3
+  ASDisplayNodeMethodOverrideTouchesBegan          = 1 << 0,
+  ASDisplayNodeMethodOverrideTouchesCancelled      = 1 << 1,
+  ASDisplayNodeMethodOverrideTouchesEnded          = 1 << 2,
+  ASDisplayNodeMethodOverrideTouchesMoved          = 1 << 3,
+  ASDisplayNodeMethodOverrideLayoutSpecThatFits    = 1 << 4
 };
 
 @class _ASPendingState;
@@ -51,13 +52,14 @@ typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides) {
   // This is the desired contentsScale, not the scale at which the layer's contents should be displayed
   CGFloat _contentsScaleForDisplay;
 
-  CGSize _size;
-  CGSize _constrainedSize;
+  ASLayout *_layout;
+  ASSizeRange _constrainedSize;
   UIEdgeInsets _hitTestSlop;
   NSMutableArray *_subnodes;
 
   ASDisplayNodeViewBlock _viewBlock;
   ASDisplayNodeLayerBlock _layerBlock;
+  ASDisplayNodeDidLoadBlock _nodeLoadedBlock;
   Class _viewClass;
   Class _layerClass;
   UIView *_view;
@@ -71,12 +73,13 @@ typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides) {
 
   _ASPendingState *_pendingViewState;
 
-  struct {
+  struct ASDisplayNodeFlags {
     // public properties
     unsigned synchronous:1;
     unsigned layerBacked:1;
     unsigned displaysAsynchronously:1;
     unsigned shouldRasterizeDescendants:1;
+    unsigned shouldBypassEnsureDisplay:1;
     unsigned displaySuspended:1;
 
     // whether custom drawing is enabled
@@ -118,9 +121,15 @@ typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides) {
 - (BOOL)__shouldSize;
 - (void)__exitedHierarchy;
 
-// Core implementation of -measure:. Must be called with _propertyLock held.
-- (CGSize)__measure:(CGSize)constrainedSize;
+// Core implementation of -measureWithSizeRange:. Must be called with _propertyLock held.
+- (ASLayout *)__measureWithSizeRange:(ASSizeRange)constrainedSize;
 
+- (void)__setNeedsLayout;
+/**
+ * Sets a new frame to this node by changing its bounds and position. This method can be safely called even if the transform property 
+ * contains a non-identity transform, because bounds and position can be changed in such case.
+ */
+- (void)__setSafeFrame:(CGRect)rect;
 - (void)__layout;
 - (void)__setSupernode:(ASDisplayNode *)supernode;
 

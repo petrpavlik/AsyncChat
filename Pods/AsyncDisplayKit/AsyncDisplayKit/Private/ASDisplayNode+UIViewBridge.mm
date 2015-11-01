@@ -60,7 +60,7 @@
 #define _messageToLayer(layerSelector) __loaded ? [_layer layerSelector] : [self.pendingViewState layerSelector]
 
 /**
- * This category implements certainly frequently-used properties and methods of UIView and CALayer so that ASDisplayNode clients can just call the view/layer methods on the node,
+ * This category implements certain frequently-used properties and methods of UIView and CALayer so that ASDisplayNode clients can just call the view/layer methods on the node,
  * with minimal loss in performance.  Unlike UIView and CALayer methods, these can be called from a non-main thread until the view or layer is created.
  * This allows text sizing in -calculateSizeThatFits: (essentially a simplified layout) to happen off the main thread
  * without any CALayer or UIView actually existing while still being able to set and read properties from ASDisplayNode instances.
@@ -85,7 +85,7 @@
   return _getFromLayer(cornerRadius);
 }
 
--(void)setCornerRadius:(CGFloat)newCornerRadius
+- (void)setCornerRadius:(CGFloat)newCornerRadius
 {
   _bridge_prologue;
   _setToLayer(cornerRadius, newCornerRadius);
@@ -122,7 +122,7 @@
   // Frame is only defined when transform is identity.
 #if DEBUG
   // Checking if the transform is identity is expensive, so disable when unnecessary. We have assertions on in Release, so DEBUG is the only way I know of.
-  ASDisplayNodeAssert(CATransform3DIsIdentity(self.transform), @"Must be an identity transform");
+  ASDisplayNodeAssert(CATransform3DIsIdentity(self.transform), @"-[ASDisplayNode frame] - self.transform must be identity in order to use the frame property.  (From Apple's UIView documentation: If the transform property is not the identity transform, the value of this property is undefined and therefore should be ignored.)");
 #endif
 
   CGPoint position = self.position;
@@ -140,25 +140,10 @@
   // Frame is only defined when transform is identity because we explicitly diverge from CALayer behavior and define frame without transform
 #if DEBUG
   // Checking if the transform is identity is expensive, so disable when unnecessary. We have assertions on in Release, so DEBUG is the only way I know of.
-  ASDisplayNodeAssert(CATransform3DIsIdentity(self.transform), @"Must be an identity transform");
+  ASDisplayNodeAssert(CATransform3DIsIdentity(self.transform), @"-[ASDisplayNode setFrame:] - self.transform must be identity in order to set the frame property.  (From Apple's UIView documentation: If the transform property is not the identity transform, the value of this property is undefined and therefore should be ignored.)");
 #endif
 
-  BOOL useLayer = (_layer && ASDisplayNodeThreadIsMain());
-  
-  CGPoint origin      = (useLayer ? _layer.bounds.origin : self.bounds.origin);
-  CGPoint anchorPoint = (useLayer ? _layer.anchorPoint   : self.anchorPoint);
-  
-  CGRect bounds       = (CGRect){ origin, rect.size };
-  CGPoint position    = CGPointMake(rect.origin.x + rect.size.width * anchorPoint.x,
-                                    rect.origin.y + rect.size.height * anchorPoint.y);
-  
-  if (useLayer) {
-    _layer.bounds = bounds;
-    _layer.position = position;
-  } else {
-    self.bounds = bounds;
-    self.position = position;
-  }
+  [self __setSafeFrame:rect];
 }
 
 - (void)setNeedsDisplay
@@ -174,6 +159,7 @@
 - (void)setNeedsLayout
 {
   _bridge_prologue;
+  [self __setNeedsLayout];
   _messageToViewOrLayer(setNeedsLayout);
 }
 
@@ -508,18 +494,6 @@
 {
   _bridge_prologue;
   _setToLayer(edgeAntialiasingMask, edgeAntialiasingMask);
-}
-
-- (NSString *)name
-{
-  _bridge_prologue;
-  return _getFromLayer(asyncdisplaykit_name);
-}
-
-- (void)setName:(NSString *)name
-{
-  _bridge_prologue;
-  _setToLayer(asyncdisplaykit_name, name);
 }
 
 - (BOOL)isAccessibilityElement

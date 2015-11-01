@@ -9,6 +9,7 @@
 #import <AsyncDisplayKit/ASImageNode.h>
 #import <AsyncDisplayKit/ASImageProtocols.h>
 
+#import <Photos/Photos.h>
 
 @protocol ASMultiplexImageNodeDelegate;
 @protocol ASMultiplexImageNodeDataSource;
@@ -28,6 +29,20 @@ typedef NS_ENUM(NSUInteger, ASMultiplexImageNodeErrorCode) {
    * Indicates that the best image identifier changed before a download for a worse identifier began.
    */
   ASMultiplexImageNodeErrorCodeBestImageIdentifierChanged,
+
+  /**
+   * Indicates that the Photos framework returned no image and no error.
+   * This may happen if the image is in iCloud and the user did not specify `allowsNetworkAccess`
+   * in their image request.
+   */
+  ASMultiplexImageNodeErrorCodePhotosImageManagerFailedWithoutError,
+  
+  /**
+   * Indicates that the image node could not retrieve the PHAsset for a given asset identifier.
+   * This typically means that the user has not given Photos framework permissions yet or the asset 
+   * has been removed from the device.
+   */
+  ASMultiplexImageNodeErrorCodePHAssetIsUnavailable
 };
 
 
@@ -97,6 +112,13 @@ typedef NS_ENUM(NSUInteger, ASMultiplexImageNodeErrorCode) {
  * @abstract The identifier for the image that the receiver is currently displaying, or nil.
  */
 @property (nonatomic, readonly) id displayedImageIdentifier;
+
+/**
+ * @abstract The image manager that this image node should use when requesting images from the Photos framework. If this is `nil` (the default), then `PHImageManager.defaultManager` is used.
+ 
+ * @see `+[NSURL URLWithAssetLocalIdentifier:targetSize:contentMode:options:]` below.
+ */
+@property (nonatomic, strong) PHImageManager *imageManager;
 
 @end
 
@@ -195,11 +217,44 @@ didFinishDownloadingImageWithIdentifier:(id)imageIdentifier
  * @abstract An image URL for the specified identifier.
  * @param imageNode The sender.
  * @param imageIdentifier The identifier for the image that will be downloaded.
- * @discussion Supported URLs include assets-library, Photo framework URLs (ph://), HTTP, HTTPS, and FTP URLs.  If the
- * image is already available to the data source, it should be provided via <[ASMultiplexImageNodeDataSource
+ * @discussion Supported URLs include HTTP, HTTPS, AssetsLibrary, and FTP URLs as well as Photos framework URLs (see note).
+ *
+ * If the image is already available to the data source, it should be provided via <[ASMultiplexImageNodeDataSource
  * multiplexImageNode:imageForImageIdentifier:]> instead.
- * @returns An NSURL for the image identified by `imageIdentifier`, or nil if none is available.
+ * @return An NSURL for the image identified by `imageIdentifier`, or nil if none is available.
+ * @see `+[NSURL URLWithAssetLocalIdentifier:targetSize:contentMode:options:]` below.
  */
 - (NSURL *)multiplexImageNode:(ASMultiplexImageNode *)imageNode URLForImageIdentifier:(id)imageIdentifier;
+
+/**
+ * @abstract A PHAsset for the specific asset local identifier
+ * @param imageNode The sender.
+ * @param assetLocalIdentifier The local identifier for a PHAsset that this image node is loading.
+ *
+ * @discussion This optional method can improve image performance if your data source already has the PHAsset available.
+ * If this method is not implemented, or returns nil, the image node will request the asset from the Photos framework.
+ * @note This method may be called from any thread.
+ * @return A PHAsset corresponding to `assetLocalIdentifier`, or nil if none is available.
+ */
+- (PHAsset *)multiplexImageNode:(ASMultiplexImageNode *)imageNode assetForLocalIdentifier:(NSString *)assetLocalIdentifier;
+
+@end
+
+#pragma mark - 
+
+@interface NSURL (ASPhotosFrameworkURLs)
+
+/**
+ * @abstract Create an NSURL that specifies an image from the Photos framework.
+ *
+ * @discussion When implementing `-multiplexImageNode:URLForImageIdentifier:`, you can return a URL
+ * created by this method and the image node will attempt to load the image from the Photos framework.
+ * @note The `synchronous` flag in `options` is ignored.
+ * @note The `Opportunistic` delivery mode is not supported and will be treated as `HighQualityFormat`.
+ */
++ (NSURL *)URLWithAssetLocalIdentifier:(NSString *)assetLocalIdentifier
+                            targetSize:(CGSize)targetSize
+                           contentMode:(PHImageContentMode)contentMode
+                               options:(PHImageRequestOptions *)options;
 
 @end

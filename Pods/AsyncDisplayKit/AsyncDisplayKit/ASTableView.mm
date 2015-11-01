@@ -7,14 +7,19 @@
  */
 
 #import "ASTableView.h"
+#import "ASTableViewInternal.h"
 
 #import "ASAssert.h"
-#import "ASDataController.h"
+#import "ASChangeSetDataController.h"
 #import "ASCollectionViewLayoutController.h"
 #import "ASLayoutController.h"
 #import "ASRangeController.h"
-#import "ASDisplayNodeInternal.h"
 #import "ASBatchFetching.h"
+#import "ASInternalHelpers.h"
+#import "ASLayout.h"
+
+// FIXME: Temporary nonsense import until method names are finalized and exposed
+#import "ASDisplayNode+Subclasses.h"
 
 //#define LOG(...) NSLog(__VA_ARGS__)
 #define LOG(...)
@@ -103,22 +108,53 @@ static BOOL _isInterceptedSelector(SEL sel)
 #pragma mark -
 #pragma mark ASCellNode<->UITableViewCell bridging.
 
+@class _ASTableViewCell;
+
+@protocol _ASTableViewCellDelegate <NSObject>
+- (void)willLayoutSubviewsOfTableViewCell:(_ASTableViewCell *)tableViewCell;
+@end
+
 @interface _ASTableViewCell : UITableViewCell
+@property (nonatomic, weak) id<_ASTableViewCellDelegate> delegate;
+@property (nonatomic, weak) ASCellNode *node;
 @end
 
 @implementation _ASTableViewCell
 // TODO add assertions to prevent use of view-backed UITableViewCell properties (eg .textLabel)
+
+- (void)layoutSubviews
+{
+  [_delegate willLayoutSubviewsOfTableViewCell:self];
+  [super layoutSubviews];
+}
+
+- (void)didTransitionToState:(UITableViewCellStateMask)state
+{
+  [self setNeedsLayout];
+  [self layoutIfNeeded];
+  [super didTransitionToState:state];
+}
+
+- (void)setSelected:(BOOL)selected
+{
+  _node.selected = selected;
+}
+
+- (void)setHighlighted:(BOOL)highlighted
+{
+  _node.highlighted = highlighted;
+}
+
 @end
 
 
 #pragma mark -
 #pragma mark ASTableView
 
-@interface ASTableView () <ASRangeControllerDelegate, ASDataControllerSource> {
+@interface ASTableView () <ASRangeControllerDelegate, ASDataControllerSource, _ASTableViewCellDelegate, ASCellNodeLayoutDelegate> {
   _ASTableViewProxy *_proxyDataSource;
   _ASTableViewProxy *_proxyDelegate;
 
-  ASDataController *_dataController;
   ASFlowLayoutController *_layoutController;
 
   ASRangeController *_rangeController;
@@ -131,58 +167,52 @@ static BOOL _isInterceptedSelector(SEL sel)
 
   NSIndexPath *_contentOffsetAdjustmentTopVisibleRow;
   CGFloat _contentOffsetAdjustment;
+
+  CGFloat _nodesConstrainedWidth;
+  BOOL _ignoreNodesConstrainedWidthChange;
 }
 
 @property (atomic, assign) BOOL asyncDataSourceLocked;
+@property (nonatomic, retain, readwrite) ASDataController *dataController;
 
 @end
 
 @implementation ASTableView
 
-/**
- @summary Conditionally performs UIView geometry changes in the given block without animation.
- 
- Used primarily to circumvent UITableView forcing insertion animations when explicitly told not to via
- `UITableViewRowAnimationNone`. More info: https://github.com/facebook/AsyncDisplayKit/pull/445
- 
- @param withoutAnimation Set to `YES` to perform given block without animation
- @param block Perform UIView geometry changes within the passed block
- */
-void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
-  if (withoutAnimation) {
-    BOOL animationsEnabled = [UIView areAnimationsEnabled];
-    [UIView setAnimationsEnabled:NO];
-    block();
-    [UIView setAnimationsEnabled:animationsEnabled];
-  } else {
-    block();
-  }
++ (Class)dataControllerClass
+{
+  return [ASChangeSetDataController class];
 }
 
 #pragma mark -
 #pragma mark Lifecycle
 
-- (void)configureWithAsyncDataFetching:(BOOL)asyncDataFetchingEnabled
+- (void)configureWithDataControllerClass:(Class)dataControllerClass asyncDataFetching:(BOOL)asyncDataFetching
 {
   _layoutController = [[ASFlowLayoutController alloc] initWithScrollOption:ASFlowLayoutDirectionVertical];
   
   _rangeController = [[ASRangeController alloc] init];
   _rangeController.layoutController = _layoutController;
   _rangeController.delegate = self;
-
-  _dataController = [[ASDataController alloc] initWithAsyncDataFetching:asyncDataFetchingEnabled];
+  
+  _dataController = [[dataControllerClass alloc] initWithAsyncDataFetching:asyncDataFetching];
   _dataController.dataSource = self;
   _dataController.delegate = _rangeController;
   
   _layoutController.dataSource = _dataController;
 
-  _asyncDataFetchingEnabled = asyncDataFetchingEnabled;
+  _asyncDataFetchingEnabled = asyncDataFetching;
   _asyncDataSourceLocked = NO;
 
   _leadingScreensForBatching = 1.0;
   _batchContext = [[ASBatchContext alloc] init];
 
   _automaticallyAdjustsContentOffset = NO;
+  
+  _nodesConstrainedWidth = self.bounds.size.width;
+  // If the initial size is 0, expect a size change very soon which is part of the initial configuration
+  // and should not trigger a relayout.
+  _ignoreNodesConstrainedWidthChange = (_nodesConstrainedWidth == 0);
 }
 
 - (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style
@@ -192,6 +222,11 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
 
 - (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style asyncDataFetching:(BOOL)asyncDataFetchingEnabled
 {
+  return [self initWithFrame:frame style:style dataControllerClass:[self.class dataControllerClass] asyncDataFetching:asyncDataFetchingEnabled];
+}
+
+- (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass asyncDataFetching:(BOOL)asyncDataFetchingEnabled
+{
   if (!(self = [super initWithFrame:frame style:style]))
     return nil;
 
@@ -199,8 +234,8 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
   // https://github.com/facebook/AsyncDisplayKit/issues/385
   asyncDataFetchingEnabled = NO;
   
-  [self configureWithAsyncDataFetching:asyncDataFetchingEnabled];
-
+  [self configureWithDataControllerClass:dataControllerClass asyncDataFetching:asyncDataFetchingEnabled];
+  
   return self;
 }
 
@@ -209,7 +244,7 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
   if (!(self = [super initWithCoder:aDecoder]))
     return nil;
 
-  [self configureWithAsyncDataFetching:NO];
+  [self configureWithDataControllerClass:[self.class dataControllerClass] asyncDataFetching:NO];
 
   return self;
 }
@@ -227,7 +262,8 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
 
 - (void)setDataSource:(id<UITableViewDataSource>)dataSource
 {
-  ASDisplayNodeAssert(NO, @"ASTableView uses asyncDataSource, not UITableView's dataSource property.");
+  // UIKit can internally generate a call to this method upon changing the asyncDataSource; only assert for non-nil.
+  ASDisplayNodeAssert(dataSource == nil, @"ASTableView uses asyncDataSource, not UITableView's dataSource property.");
 }
 
 - (void)setDelegate:(id<UITableViewDelegate>)delegate
@@ -277,7 +313,7 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
 - (void)reloadDataWithCompletion:(void (^)())completion
 {
   ASDisplayNodeAssert(self.asyncDelegate, @"ASTableView's asyncDelegate property must be set.");
-  ASDisplayNodePerformBlockOnMainThread(^{
+  ASPerformBlockOnMainThread(^{
     [super reloadData];
   });
   [_dataController reloadDataWithAnimationOptions:UITableViewRowAnimationNone completion:completion];
@@ -286,6 +322,13 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
 - (void)reloadData
 {
   [self reloadDataWithCompletion:nil];
+}
+
+- (void)reloadDataImmediately
+{
+  ASDisplayNodeAssertMainThread();
+  [_dataController reloadDataImmediatelyWithAnimationOptions:UITableViewRowAnimationNone];
+  [super reloadData];
 }
 
 - (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeType:(ASLayoutRangeType)rangeType
@@ -311,6 +354,11 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
 - (ASCellNode *)nodeForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   return [_dataController nodeAtIndexPath:indexPath];
+}
+
+- (NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode
+{
+  return [_dataController indexPathForNode:cellNode];
 }
 
 - (NSArray *)visibleNodes
@@ -341,6 +389,26 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
 {
   ASDisplayNodeAssertMainThread();
   [_dataController endUpdatesAnimated:animated completion:completion];
+}
+
+- (void)layoutSubviews
+{
+  if (_nodesConstrainedWidth != self.bounds.size.width) {
+    _nodesConstrainedWidth = self.bounds.size.width;
+
+    // First width change occurs during initial configuration. An expensive relayout pass is unnecessary at that time
+    // and should be avoided, assuming that the initial data loading automatically runs shortly afterward.
+    if (_ignoreNodesConstrainedWidthChange) {
+      _ignoreNodesConstrainedWidthChange = NO;
+    } else {
+      [self beginUpdates];
+      [_dataController relayoutAllNodes];
+      [self endUpdates];
+    }
+  }
+  
+  // To ensure _nodesConstrainedWidth is up-to-date for every usage, this call to super must be done last
+  [super layoutSubviews];
 }
 
 #pragma mark -
@@ -455,11 +523,13 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
   _ASTableViewCell *cell = [self dequeueReusableCellWithIdentifier:reuseIdentifier];
   if (!cell) {
     cell = [[_ASTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
+    cell.delegate = self;
   }
 
   ASCellNode *node = [_dataController nodeAtIndexPath:indexPath];
   [_rangeController configureContentView:cell.contentView forCellNode:node];
 
+  cell.node = node;
   cell.backgroundColor = node.backgroundColor;
   cell.selectionStyle = node.selectionStyle;
 
@@ -508,6 +578,11 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
 
   if ([_asyncDelegate respondsToSelector:@selector(tableView:willDisplayNodeForRowAtIndexPath:)]) {
     [_asyncDelegate tableView:self willDisplayNodeForRowAtIndexPath:indexPath];
+  }
+
+  ASCellNode *cellNode = [self nodeForRowAtIndexPath:indexPath];
+  if (cellNode.neverShowPlaceholders) {
+    [cellNode recursivelyEnsureDisplay];
   }
 }
 
@@ -745,12 +820,14 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
 {
   ASCellNode *node = [_asyncDataSource tableView:self nodeForRowAtIndexPath:indexPath];
   ASDisplayNodeAssert([node isKindOfClass:ASCellNode.class], @"invalid node class, expected ASCellNode");
+  node.layoutDelegate = self;
   return node;
 }
 
-- (CGSize)dataController:(ASDataController *)dataController constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath
+- (ASSizeRange)dataController:(ASDataController *)dataController constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath
 {
-  return CGSizeMake(self.bounds.size.width, FLT_MAX);
+  return ASSizeRangeMake(CGSizeMake(_nodesConstrainedWidth, 0),
+                         CGSizeMake(_nodesConstrainedWidth, FLT_MAX));
 }
 
 - (void)dataControllerLockDataSource
@@ -780,12 +857,52 @@ void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)()) {
   return [_asyncDataSource tableView:self numberOfRowsInSection:section];
 }
 
-- (NSUInteger)dataControllerNumberOfSections:(ASDataController *)dataController
+- (NSUInteger)numberOfSectionsInDataController:(ASDataController *)dataController
 {
   if ([_asyncDataSource respondsToSelector:@selector(numberOfSectionsInTableView:)]) {
     return [_asyncDataSource numberOfSectionsInTableView:self];
   } else {
     return 1; // default section number
+  }
+}
+
+#pragma mark - _ASTableViewCellDelegate
+
+- (void)willLayoutSubviewsOfTableViewCell:(_ASTableViewCell *)tableViewCell
+{
+  CGFloat contentViewWidth = tableViewCell.contentView.bounds.size.width;
+  ASCellNode *node = tableViewCell.node;
+  ASSizeRange constrainedSize = node.constrainedSizeForCalculatedLayout;
+  
+  // Table view cells should always fill its content view width.
+  // Normally the content view width equals to the constrained size width (which equals to the table view width).
+  // If there is a mismatch between these values, for example after the table view entered or left editing mode,
+  // content view width is preferred and used to re-measure the cell node.
+  if (contentViewWidth != constrainedSize.max.width) {
+    constrainedSize.min.width = contentViewWidth;
+    constrainedSize.max.width = contentViewWidth;
+
+    // Re-measurement is done on main to ensure thread affinity. In the worst case, this is as fast as UIKit's implementation.
+    //
+    // Unloaded nodes *could* be re-measured off the main thread, but only with the assumption that content view width
+    // is the same for all cells (because there is no easy way to get that individual value before the node being assigned to a _ASTableViewCell).
+    // Also, in many cases, some nodes may not need to be re-measured at all, such as when user enters and then immediately leaves editing mode.
+    // To avoid premature optimization and making such assumption, as well as to keep ASTableView simple, re-measurement is strictly done on main.
+    [self beginUpdates];
+    CGSize calculatedSize = [[node measureWithSizeRange:constrainedSize] size];
+    node.frame = CGRectMake(0, 0, calculatedSize.width, calculatedSize.height);
+    [self endUpdates];
+  }
+}
+
+#pragma mark - ASCellNodeDelegate
+
+- (void)node:(ASCellNode *)node didRelayoutWithSuggestedAnimation:(ASCellNodeAnimation)animation
+{
+  ASDisplayNodeAssertMainThread();
+  NSIndexPath *indexPath = [self indexPathForNode:node];
+  if (indexPath != nil) {
+    [super reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:(UITableViewRowAnimation)animation];
   }
 }
 

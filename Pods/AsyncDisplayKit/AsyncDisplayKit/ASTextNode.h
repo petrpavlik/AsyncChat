@@ -8,7 +8,6 @@
 
 #import <AsyncDisplayKit/ASControlNode.h>
 
-
 @protocol ASTextNodeDelegate;
 
 /**
@@ -79,6 +78,15 @@ typedef NS_ENUM(NSUInteger, ASTextNodeHighlightStyle) {
 @property (nonatomic, strong) NSArray *exclusionPaths;
 
 #pragma mark - Placeholders
+
+/**
+ * @abstract ASTextNode has a special placeholder behavior when placeholderEnabled is YES.
+ *
+ * @discussion Defaults to NO.  When YES, it draws rectangles for each line of text,
+ * following the true shape of the text's wrapping.  This visually mirrors the overall
+ * shape and weight of paragraphs, making the appearance of the finished text less jarring.
+ */
+@property (nonatomic, assign) BOOL placeholderEnabled;
 
 /**
  @abstract The placeholder color.

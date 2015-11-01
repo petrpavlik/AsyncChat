@@ -41,7 +41,7 @@
  *
  * @param contentView UIView to add a (sized) node's view to.
  *
- * @param node The ASCellNode to be added.
+ * @param cellNode The cell node to be added.
  */
 - (void)configureContentView:(UIView *)contentView forCellNode:(ASCellNode *)node;
 
@@ -85,7 +85,7 @@
  * End updates.
  *
  * @param rangeController Sender.
- *
+ * @param animated NO if all animations are disabled. YES otherwise.
  * @param completion Completion block.
  */
 - (void)rangeController:(ASRangeController * )rangeController endUpdatesAnimated:(BOOL)animated completion:(void (^)(BOOL))completion;
@@ -104,6 +104,8 @@
  *
  * @param rangeController Sender.
  *
+ * @param nodes Inserted nodes.
+ *
  * @param indexPaths Index path of inserted nodes.
  *
  * @param animationOptions Animation options. See ASDataControllerAnimationOptions.
@@ -114,6 +116,8 @@
  * Called for nodes deletion.
  *
  * @param rangeController Sender.
+ *
+ * @param nodes Deleted nodes.
  *
  * @param indexPaths Index path of deleted nodes.
  *

@@ -10,10 +10,10 @@
 
 #import "ASAssert.h"
 #import "ASDisplayNodeExtras.h"
-#import "ASDisplayNodeInternal.h"
 #import "ASMultiDimensionalArrayUtils.h"
 #import "ASRangeHandlerRender.h"
 #import "ASRangeHandlerPreload.h"
+#import "ASInternalHelpers.h"
 
 @interface ASRangeController () {
   BOOL _rangeIsValid;
@@ -48,7 +48,7 @@
 
 #pragma mark - View manipulation
 
-- (void)moveNode:(ASCellNode *)node toView:(UIView *)view
+- (void)moveCellNode:(ASCellNode *)node toView:(UIView *)view
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssert(node, @"Cannot move a nil node to a view");
@@ -75,7 +75,7 @@
 
   // coalesce these events -- handling them multiple times per runloop is noisy and expensive
   _queuedRangeUpdate = YES;
-
+    
   [self performSelector:@selector(updateVisibleNodeIndexPaths)
              withObject:nil
              afterDelay:0
@@ -158,9 +158,9 @@
   return rangeType == ASLayoutRangeTypeRender;
 }
 
-- (void)configureContentView:(UIView *)contentView forCellNode:(ASCellNode *)cellNode
+- (void)configureContentView:(UIView *)contentView forCellNode:(ASCellNode *)node
 {
-  if (cellNode.view.superview == contentView) {
+  if (node.view.superview == contentView) {
     // this content view is already correctly configured
     return;
   }
@@ -170,20 +170,20 @@
     [view removeFromSuperview];
   }
 
-  [self moveNode:cellNode toView:contentView];
+  [self moveCellNode:node toView:contentView];
 }
 
 
 #pragma mark - ASDataControllerDelegete
 
 - (void)dataControllerBeginUpdates:(ASDataController *)dataController {
-  ASDisplayNodePerformBlockOnMainThread(^{
+  ASPerformBlockOnMainThread(^{
     [_delegate rangeControllerBeginUpdates:self];
   });
 }
 
 - (void)dataController:(ASDataController *)dataController endUpdatesAnimated:(BOOL)animated completion:(void (^)(BOOL))completion {
-  ASDisplayNodePerformBlockOnMainThread(^{
+  ASPerformBlockOnMainThread(^{
     [_delegate rangeController:self endUpdatesAnimated:animated completion:completion];
   });
 }
@@ -196,14 +196,14 @@
     [nodeSizes addObject:[NSValue valueWithCGSize:node.calculatedSize]];
   }];
 
-  ASDisplayNodePerformBlockOnMainThread(^{
+  ASPerformBlockOnMainThread(^{
     _rangeIsValid = NO;
     [_delegate rangeController:self didInsertNodes:nodes atIndexPaths:indexPaths withAnimationOptions:animationOptions];
   });
 }
 
 - (void)dataController:(ASDataController *)dataController didDeleteNodes:(NSArray *)nodes atIndexPaths:(NSArray *)indexPaths withAnimationOptions:(ASDataControllerAnimationOptions)animationOptions {
-  ASDisplayNodePerformBlockOnMainThread(^{
+  ASPerformBlockOnMainThread(^{
     _rangeIsValid = NO;
     [_delegate rangeController:self didDeleteNodes:nodes atIndexPaths:indexPaths withAnimationOptions:animationOptions];
   });
@@ -222,14 +222,14 @@
     [sectionNodeSizes addObject:nodeSizes];
   }];
 
-  ASDisplayNodePerformBlockOnMainThread(^{
+  ASPerformBlockOnMainThread(^{
     _rangeIsValid = NO;
     [_delegate rangeController:self didInsertSectionsAtIndexSet:indexSet withAnimationOptions:animationOptions];
   });
 }
 
 - (void)dataController:(ASDataController *)dataController didDeleteSectionsAtIndexSet:(NSIndexSet *)indexSet withAnimationOptions:(ASDataControllerAnimationOptions)animationOptions {
-  ASDisplayNodePerformBlockOnMainThread(^{
+  ASPerformBlockOnMainThread(^{
     _rangeIsValid = NO;
     [_delegate rangeController:self didDeleteSectionsAtIndexSet:indexSet withAnimationOptions:animationOptions];
   });

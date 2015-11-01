@@ -13,6 +13,7 @@
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASThread.h>
 
+@class ASLayoutSpec;
 
 /**
  * The subclass header _ASDisplayNode+Subclasses_ defines the following methods that either must or can be overriden by
@@ -65,6 +66,26 @@
  */
 @property (nonatomic, readonly, assign, getter=isInHierarchy) BOOL inHierarchy;
 
+/**
+ * @abstract Return the calculated layout.
+ *
+ * @discussion For node subclasses that implement manual layout (e.g., they have a custom -layout method), 
+ * calculatedLayout may be accessed on subnodes to retrieved cached information about their size.  
+ * This allows -layout to be very fast, saving time on the main thread.  
+ * Note: .calculatedLayout will only be set for nodes that have had -measure: called on them.  
+ * For manual layout, make sure you call -measure: in your implementation of -calculateSizeThatFits:.
+ *
+ * For node subclasses that use automatic layout (e.g., they implement -layoutSpecThatFits:), 
+ * it is typically not necessary to use .calculatedLayout at any point.  For these nodes, 
+ * the ASLayoutSpec implementation will automatically call -measureWithSizeRange: on all of the subnodes,
+ * and the ASDisplayNode base class implementation of -layout will automatically make use of .calculatedLayout on the subnodes.
+ *
+ * @return Layout that wraps calculated size returned by -calculateSizeThatFits: (in manual layout mode),
+ * or layout already calculated from layout spec returned by -layoutSpecThatFits: (in automatic layout mode).
+ *
+ * @warning Subclasses must not override this; it returns the last cached layout and is never expensive.
+ */
+@property (nonatomic, readonly, assign) ASLayout *calculatedLayout;
 
 /** @name View Lifecycle */
 
@@ -96,8 +117,22 @@
 - (void)layoutDidFinish;
 
 
-/** @name Sizing */
+/** @name Layout calculation */
 
+/**
+ * @abstract Calculate a layout based on given size range.
+ *
+ * @param constrainedSize The minimum and maximum sizes the receiver should fit in.
+ *
+ * @return An ASLayout instance defining the layout of the receiver (and its children, if the box layout model is used).
+ *
+ * @discussion This method is called on a non-main thread. The default implementation calls either -layoutSpecThatFits: 
+ * or -calculateSizeThatFits:, whichever method is overriden. Subclasses rarely need to override this method,
+ * override -layoutSpecThatFits: or -calculateSizeThatFits: instead.
+ *
+ * @note This method should not be called directly outside of ASDisplayNode; use -measure: or -calculatedLayout instead.
+ */
+- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize;
 
 /**
  * @abstract Return the calculated size.
@@ -105,21 +140,37 @@
  * @param constrainedSize The maximum size the receiver should fit in.
  *
  * @discussion Subclasses that override should expect this method to be called on a non-main thread. The returned size
- * is cached by ASDisplayNode for quick access during -layout, via -calculatedSize. Other expensive work that needs to
+ * is wrapped in an ASLayout and cached for quick access during -layout. Other expensive work that needs to
  * be done before display can be performed here, and using ivars to cache any valuable intermediate results is
  * encouraged.
  *
- * @note This method should not be called directly outside of ASDisplayNode; use -measure: or -calculatedSize instead.
+ * @note Subclasses that override are committed to manual layout. Therefore, -layout: must be overriden to layout all subnodes or subviews.
+ *
+ * @note This method should not be called directly outside of ASDisplayNode; use -measure: or -calculatedLayout instead.
  */
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize;
 
 /**
- * @abstract Invalidate previously measured and cached size.
+ * @abstract Return a layout spec that describes the layout of the receiver and its children.
  *
- * @discussion Subclasses should call this method to invalidate the previously measured and cached size for the display
+ * @param constrainedSize The minimum and maximum sizes the receiver should fit in.
+ *
+ * @discussion Subclasses that override should expect this method to be called on a non-main thread. The returned layout spec
+ * is used to calculate an ASLayout and cached by ASDisplayNode for quick access during -layout. Other expensive work that needs to
+ * be done before display can be performed here, and using ivars to cache any valuable intermediate results is
+ * encouraged.
+ *
+ * @note This method should not be called directly outside of ASDisplayNode; use -measure: or -calculatedLayout instead.
+ */
+- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize;
+
+/**
+ * @abstract Invalidate previously measured and cached layout.
+ *
+ * @discussion Subclasses should call this method to invalidate the previously measured and cached layout for the display
  * node, when the contents of the node change in such a way as to require measuring it again.
  */
-- (void)invalidateCalculatedSize;
+- (void)invalidateCalculatedLayout;
 
 
 /** @name Drawing */
@@ -378,7 +429,39 @@
 // This method has proven helpful in a few rare scenarios, similar to a category extension on UIView,
 // but it's considered private API for now and its use should not be encouraged.
 - (ASDisplayNode *)_supernodeWithClass:(Class)supernodeClass;
+
+// The two methods below will eventually be exposed, but their names are subject to change.
+/**
+ * @abstract Ensure that all rendering is complete for this node and its descendents.
+ *
+ * @discussion Calling this method on the main thread after a node is added to the view heirarchy will ensure that
+ * placeholder states are never visible to the user.  It is used by ASTableView, ASCollectionView, and ASViewController
+ * to implement their respective ".neverShowPlaceholders" option.
+ *
+ * If all nodes have layer.contents set and/or their layer does not have -needsDisplay set, the method will return immediately.
+ *
+ * This method is capable of handling a mixed set of nodes, with some not having started display, some in progress on an
+ * asynchronous display operation, and some already finished.
+ *
+ * In order to guarantee against deadlocks, this method should only be called on the main thread.
+ * It may block on the private queue, [_ASDisplayLayer displayQueue]
+ */
+- (void)recursivelyEnsureDisplay;
+
+/**
+ * @abstract Allows a node to bypass all ensureDisplay passes.  Defaults to NO.
+ *
+ * @discussion Nodes that are expensive to draw and expected to have placeholder even with
+ * .neverShowPlaceholders enabled should set this to YES.
+ *
+ * ASImageNode uses the default of NO, as it is often used for UI images that are expected to synchronize with ensureDisplay.
+ *
+ * ASNetworkImageNode and ASMultiplexImageNode set this to YES, because they load data from a database or server,
+ * and are expected to support a placeholder state given that display is often blocked on slow data fetching.
+ */
+@property (nonatomic, assign) BOOL shouldBypassEnsureDisplay;
+
 @end
 
-#define ASDisplayNodeAssertThreadAffinity(viewNode)   ASDisplayNodeAssert(!viewNode || ASDisplayNodeThreadIsMain() || !(viewNode).nodeLoaded, @"Incorrect display node thread affinity")
-#define ASDisplayNodeCAssertThreadAffinity(viewNode) ASDisplayNodeCAssert(!viewNode || ASDisplayNodeThreadIsMain() || !(viewNode).nodeLoaded, @"Incorrect display node thread affinity")
+#define ASDisplayNodeAssertThreadAffinity(viewNode)   ASDisplayNodeAssert(!viewNode || ASDisplayNodeThreadIsMain() || !(viewNode).nodeLoaded, @"Incorrect display node thread affinity - this method should not be called off the main thread after the ASDisplayNode's view or layer have been created")
+#define ASDisplayNodeCAssertThreadAffinity(viewNode) ASDisplayNodeCAssert(!viewNode || ASDisplayNodeThreadIsMain() || !(viewNode).nodeLoaded, @"Incorrect display node thread affinity - this method should not be called off the main thread after the ASDisplayNode's view or layer have been created")

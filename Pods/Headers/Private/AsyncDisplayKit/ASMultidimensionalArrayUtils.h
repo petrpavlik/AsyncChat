@@ -1,1 +1,1 @@
-../../../AsyncDisplayKit/AsyncDisplayKit/Details/ASMultidimensionalArrayUtils.h
+../../../AsyncDisplayKit/AsyncDisplayKit/Private/ASMultidimensionalArrayUtils.h

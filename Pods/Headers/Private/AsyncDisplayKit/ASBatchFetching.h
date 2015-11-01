@@ -1,1 +1,1 @@
-../../../AsyncDisplayKit/AsyncDisplayKit/Details/ASBatchFetching.h
+../../../AsyncDisplayKit/AsyncDisplayKit/Private/ASBatchFetching.h
