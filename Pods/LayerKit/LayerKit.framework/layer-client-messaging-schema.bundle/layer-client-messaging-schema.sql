@@ -67,6 +67,12 @@ CREATE TABLE "events" (
   FOREIGN KEY(stream_database_identifier) REFERENCES streams(database_identifier) ON DELETE CASCADE
 );
 
+CREATE TABLE fts_trigger_mime_type_mapping (
+	database_identifier INTEGER PRIMARY KEY AUTOINCREMENT,
+	mime_type TEXT NOT NULL,
+	fts_trigger_name TEXT UNIQUE NOT NULL
+);
+
 CREATE TABLE local_keyed_values (
   database_identifier INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   object_type TEXT NOT NULL,
@@ -203,6 +209,8 @@ CREATE INDEX message_recipient_status_message_database_identifier_idx ON message
 
 CREATE INDEX messages_conversation_database_identifier_idx ON messages(conversation_database_identifier);
 
+CREATE INDEX messages_conversationdbid_and_isunread_idx ON messages(conversation_database_identifier, is_unread);
+
 CREATE INDEX messages_deleted_at_idx ON messages(deleted_at);
 
 CREATE INDEX messages_event_database_identifier_idx ON messages(event_database_identifier);
@@ -232,9 +240,9 @@ CREATE TRIGGER tombstone_duplicate_events_by_client_id
 AFTER INSERT ON events
 FOR EACH ROW WHEN NEW.client_id IS NOT NULL
 BEGIN
-       UPDATE events SET type = 10
-       WHERE database_identifier = NEW.database_identifier
-       AND (SELECT count(*) FROM events WHERE client_id = NEW.client_id) > 1;
+  UPDATE events SET type = 10
+  WHERE database_identifier = NEW.database_identifier
+  AND (SELECT count(*) FROM events WHERE client_id = NEW.client_id) > 1;
 END;
 
 CREATE TRIGGER track_deletes_of_conversation_participants AFTER UPDATE OF deleted_at ON conversation_participants
@@ -501,3 +509,9 @@ INSERT INTO schema_migrations (version) VALUES (20150529142429027);
 INSERT INTO schema_migrations (version) VALUES (20150615160151227);
 
 INSERT INTO schema_migrations (version) VALUES (20150811193933922);
+
+INSERT INTO schema_migrations (version) VALUES (20150921163335597);
+
+INSERT INTO schema_migrations (version) VALUES (20151019115229223);
+
+INSERT INTO schema_migrations (version) VALUES (20151028150015461);

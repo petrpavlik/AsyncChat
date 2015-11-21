@@ -15,6 +15,7 @@
 #import "ASMultiplexImageNode.h"
 #import "ASNetworkImageNode.h"
 #import "ASScrollNode.h"
+#import "ASTableNode.h"
 #import "ASTableView.h"
 #import "ASTableViewInternal.h"
 #import "ASTableViewProtocols.h"

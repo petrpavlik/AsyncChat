@@ -80,8 +80,8 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
         return size
     }
     
-    override func invalidateCalculatedSize() {
-        super.invalidateCalculatedSize()
+    override func invalidateCalculatedLayout() {
+        super.invalidateCalculatedLayout()
         cachedTextNodeSize = nil
     }
     

@@ -60,6 +60,7 @@ typedef NS_ENUM(NSUInteger, LYRClientError) {
     LYRClientErrorUndefinedSyncFailure              = 9000,
     LYRClientErrorDevicePersistenceFailure          = 9001,
     LYRClientErrorSynchronizationFailure            = 9002,
+    LYRClientErrorManualSyncIgnoredInForeground     = 9003,
     
     // Debug Errors
     LYRClientErrorZipArchiveCreationFailure         = 10001,

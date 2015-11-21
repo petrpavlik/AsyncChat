@@ -7,15 +7,27 @@
 //
 
 import UIKit
+import LayerKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, LYRClientDelegate {
 
     var window: UIWindow?
+    
+    let layerClient = LYRClient(appID: NSURL(string: "layer:///apps/staging/aec569e6-80dd-11e5-ba33-6acb000043e7"))
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        layerClient.connectWithCompletion { (success, error) -> Void in
+            self.layerClient.requestAuthenticationNonceWithCompletion({ (nonce, error) -> Void in
+                self.layerClient.authenticateWithIdentityToken("jICMAO4EXvjHSjj0bpgBnHXMxBn7ufxm6d34Ra6dz3aWas8I") { (authenticatedUserID, error) -> Void in
+                    print("authenticated as \(authenticatedUserID)")
+                }
+            })
+        }
+        
         return true
     }
 
@@ -41,6 +53,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
+    func layerClient(client: LYRClient!, didReceiveAuthenticationChallengeWithNonce nonce: String!) {
+        
+    }
 
 }
 

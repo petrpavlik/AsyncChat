@@ -506,16 +506,6 @@ typedef void (^ASDisplayNodeDidLoadBlock)(ASDisplayNode *node);
  */
 - (CGRect)convertRect:(CGRect)rect fromNode:(ASDisplayNode *)node;
 
-/** @name UIResponder methods */
-
-// By default these fall through to the underlying view, but can be overridden.
-- (BOOL)canBecomeFirstResponder;                                            // default==NO
-- (BOOL)becomeFirstResponder;                                               // default==NO (no-op)
-- (BOOL)canResignFirstResponder;                                            // default==YES
-- (BOOL)resignFirstResponder;                                               // default==NO (no-op)
-- (BOOL)isFirstResponder;
-- (BOOL)canPerformAction:(SEL)action withSender:(id)sender;
-
 @end
 
 
@@ -559,6 +549,9 @@ typedef void (^ASDisplayNodeDidLoadBlock)(ASDisplayNode *node);
  * 
  * If this node was measured, calling this method triggers an internal relayout: the calculated layout is invalidated,
  * and the supernode is notified or (if this node is the root one) a full measurement pass is executed using the old constrained size.
+ *
+ * Note: ASCellNode has special behavior in that calling this method will automatically notify 
+ * the containing ASTableView / ASCollectionView that the cell should be resized, if necessary.
  */
 - (void)setNeedsLayout;
 
@@ -613,6 +606,15 @@ typedef void (^ASDisplayNodeDidLoadBlock)(ASDisplayNode *node);
 @property (atomic, assign)           CGFloat shadowRadius;                  // default=3
 @property (atomic, assign)           CGFloat borderWidth;                   // default=0
 @property (atomic, assign)           CGColorRef borderColor;                // default=opaque rgb black
+
+// UIResponder methods
+// By default these fall through to the underlying view, but can be overridden.
+- (BOOL)canBecomeFirstResponder;                                            // default==NO
+- (BOOL)becomeFirstResponder;                                               // default==NO (no-op)
+- (BOOL)canResignFirstResponder;                                            // default==YES
+- (BOOL)resignFirstResponder;                                               // default==NO (no-op)
+- (BOOL)isFirstResponder;
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender;
 
 // Accessibility support
 @property (atomic, assign)           BOOL isAccessibilityElement;
