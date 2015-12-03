@@ -45,6 +45,7 @@
 #import "ASRangeHandler.h"
 #import "ASRangeHandlerPreload.h"
 #import "ASRangeHandlerRender.h"
+#import "ASRangeHandlerVisible.h"
 #import "ASScrollDirection.h"
 #import "ASTextNodeCoreTextAdditions.h"
 #import "ASTextNodeRenderer.h"

@@ -39,11 +39,17 @@ These instructions will setup your local CocoaPods environment and import LayerK
 
 #### Framework Installation
 
-If you wish to install LayerKit directly into your application via the binary framework, then download `LayerKit.embeddedframework` from this repository and add it to your application:
+If you wish to install LayerKit directly into your application via the binary framework, then you have a choice between two distributions:
+
+* `LayerKit.framework` - This build artifact is a dynamic framework that is compatible with Objective-C and Swift projects that target **iOS 8** and higher.
+* `LayerKit.embeddedframework` - This build artifact is a pseudo-framework that contains a static library asset and a set of public header files. It is compatible with Objective-C projects that target **iOS 7** and higher.
+
+Download the appropriate build artifact from this repository and add it to your application:
 
 1. Drag and drop the framework onto your project, instructing Xcode to copy items into your destination group's folder.
 2. Update your project settings to include the linker flags: `-ObjC -lz`
 3. Add the following Cocoa SDK frameworks to your project: `'CFNetwork', 'Security', 'MobileCoreServices', 'SystemConfiguration'`
+4. *LayerKit.framework only*: The dynamic framework distribution requires the configuration of additional build phases to complete installation. The steps are detailed on the [Layer Knowledge Base](https://support.layer.com/hc/en-us/articles/204256740-Can-I-use-LayerKit-without-Cocoapods-).
 
 Build and run your project to verify installation was successful. Once you have completed a successful build, refer to the [Verifying LayerKit Configuration](#verifying-layerkit-configuration) section below for details on how to test your setup.
 
@@ -56,7 +62,7 @@ Once you have finished installing LayerKit via CocoaPods or framework, you can t
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-	NSUUID *appID = [[NSUUID alloc] initWithUUIDString:@"INSERT-UUID-HERE"];
+	NSURL *appID = [NSURL URLWithString:@"INSERT-APPID-URL-HERE"];
 	LYRClient *layerClient = [LYRClient clientWithAppID:appID];
 	[layerClient connectWithCompletion:^(BOOL success, NSError *error) {
 		if (success) {

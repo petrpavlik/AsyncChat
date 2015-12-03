@@ -1,8 +1,8 @@
 PODS:
-  - AsyncDisplayKit (1.9.1):
-    - AsyncDisplayKit/ASDealloc2MainObject (= 1.9.1)
-  - AsyncDisplayKit/ASDealloc2MainObject (1.9.1)
-  - LayerKit (0.17.2)
+  - AsyncDisplayKit (1.9.2):
+    - AsyncDisplayKit/ASDealloc2MainObject (= 1.9.2)
+  - AsyncDisplayKit/ASDealloc2MainObject (1.9.2)
+  - LayerKit (0.17.3)
   - Toucan (0.4.3)
 
 DEPENDENCIES:
@@ -11,8 +11,8 @@ DEPENDENCIES:
   - Toucan
 
 SPEC CHECKSUMS:
-  AsyncDisplayKit: 7bf2b3fa444284f80fd0c1e36655e324549f79d2
-  LayerKit: 60f1f23923e2718992eba22c6e9a8ef92b6344bc
+  AsyncDisplayKit: 181097819b528d9337983acc5040df6687f06369
+  LayerKit: 92d150935d9b25c7ede0d6b47de5ddd237b1ee85
   Toucan: 3e2319c8fb9c7a2fb9c30f6d4ecdc6b8a2f1c92b
 
 COCOAPODS: 0.39.0

@@ -75,6 +75,44 @@ typedef NS_ENUM(NSInteger, LYRContentTransferType) {
     LYRContentTransferTypeUpload                = 1
 };
 
+
+
+///---------------------
+/// @name Log Components
+///---------------------
+
+typedef NS_ENUM(NSUInteger, LYRLogComponent) {
+    LYRLogComponentUndefined,
+    LYRLogComponentInitialization,
+    LYRLogComponentCertification,
+    LYRLogComponentAuthentication,
+    LYRLogComponentTransport,
+    LYRLogComponentTransportPush,
+    LYRLogComponentPlatformPush,
+    LYRLogComponentModel,
+    LYRLogComponentSQLite,
+    LYRLogComponentSynchronization,
+    LYRLogComponentInboundReconciliation,
+    LYRLogComponentOutboundReconciliation,
+    LYRLogComponentMessagingPublicAPI,
+    LYRLogComponentRichContent,
+    LYRLogComponentApplicationState,
+    LYRLogComponentCount
+};
+
+///-----------------
+/// @name Log Levels
+///-----------------
+
+typedef NS_ENUM(NSUInteger, LYRLogLevel) {
+    LYRLogLevelOff,
+    LYRLogLevelError,
+    LYRLogLevelWarn,
+    LYRLogLevelInfo,
+    LYRLogLevelDebug,
+    LYRLogLevelVerbose
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////
 
 /*

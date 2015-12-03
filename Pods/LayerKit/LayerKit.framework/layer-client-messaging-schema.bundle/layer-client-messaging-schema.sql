@@ -412,8 +412,9 @@ BEGIN
 END;
 
 CREATE TRIGGER track_updates_of_stream_database_identifier_for_conversation AFTER UPDATE OF stream_database_identifier ON conversations
+WHEN (OLD.stream_id IS NULL AND NEW.stream_id IS NULL) OR OLD.stream_id = NEW.stream_id
 BEGIN
-INSERT INTO synced_changes(table_name, row_identifier, change_type) VALUES ('streams', NEW.stream_database_identifier, 1);
+  INSERT INTO synced_changes(table_name, row_identifier, change_type) VALUES ('streams', NEW.stream_database_identifier, 1);
 END;
 
 CREATE TRIGGER track_updates_of_stream_id_for_events AFTER UPDATE OF stream_database_identifier ON events
@@ -515,3 +516,5 @@ INSERT INTO schema_migrations (version) VALUES (20150921163335597);
 INSERT INTO schema_migrations (version) VALUES (20151019115229223);
 
 INSERT INTO schema_migrations (version) VALUES (20151028150015461);
+
+INSERT INTO schema_migrations (version) VALUES (20151120145829172);

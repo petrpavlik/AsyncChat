@@ -566,6 +566,30 @@ extern NSString *const LYRClientContentTransferProgressUserInfoKey;
  */
 @property (nonatomic) LYRSize autodownloadMaximumContentSize;
 
+///----------------
+/// @name Debugging
+///----------------
+
+/**
+ @abstract Captures a debug snapshot of the current state of the Layer powered application and persists it to the file system.
+ @param completion A block to be called upon completion of the asynchronous request for a debug snapshot. The block takes one parameter: an `NSURL` location of the snapshot on the file system.
+ @discussion The debug snapshot is a zip file containing the following: 1. A JSON dump of diagnostic information about the `LYRClient` 2. A copy of the local database, 3. A copy of any accumulated log files.
+ */
+- (void)captureDebugSnapshotWithCompletion:(void(^)(NSURL *snapshotPath, NSError *error))completion;
+
+/**
+ @abstract When `YES`, `LayerKit` will log detailed debugging information to both the XCode debugger and the file system.
+ @discussion When debugging is enabled, all components will begin to synchronously log detailed information to both the file system and the debugger.
+ */
+@property (nonatomic) BOOL debuggingEnabled;
+
+/**
+ @abstract Configures the log level for the specified component
+ @param level The log level to be set for the component.
+ @param component The component to configure.
+ */
+- (void)setLogLevel:(LYRLogLevel)level forComponent:(LYRLogComponent)component;
+
 @end
 
 ///////////////////////////////////////////////////////////////////////////////////////

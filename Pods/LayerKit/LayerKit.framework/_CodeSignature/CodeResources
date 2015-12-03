@@ -14,11 +14,11 @@
 		</data>
 		<key>Headers/LYRClient.h</key>
 		<data>
-		QWFWEmYP2+zo0Hl0V3wK8Wtw1Oo=
+		8QhNcsorTLGG3T5/KRNtx3sd+OA=
 		</data>
 		<key>Headers/LYRConstants.h</key>
 		<data>
-		5D7MRmkSIUOzKExYUmiQ0eWI8nw=
+		8Kv9nDXRL6z+qd3Wy1ruo04oS2c=
 		</data>
 		<key>Headers/LYRConversation.h</key>
 		<data>
@@ -74,7 +74,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		/1op7oBl6CdJtVqpcV/q4vshzDA=
+		/hSDSQhwJNyYSfJC8G4TyuL9jzQ=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -142,7 +142,7 @@
 		</data>
 		<key>PrivateHeaders/LYRClient+Private.h</key>
 		<data>
-		igYBuJoGEdF6i5BCh0HoY7hJHf8=
+		pwgo0TzCx8QxfsjAsAx4UltXsos=
 		</data>
 		<key>PrivateHeaders/LYRConcurrentOperation.h</key>
 		<data>
@@ -354,7 +354,7 @@
 		</data>
 		<key>PrivateHeaders/LYRLog.h</key>
 		<data>
-		mhWNjoi9CgzgRmW0G/HSp+/a4JA=
+		EBJZaThj5bnt3RbVvahID5C2ba0=
 		</data>
 		<key>PrivateHeaders/LYRMacros.h</key>
 		<data>
@@ -566,7 +566,7 @@
 		</data>
 		<key>PrivateHeaders/LYRStreamRepository.h</key>
 		<data>
-		G06d+J13gcGTinX5wWUTYx3L5sw=
+		xQhqwMBTjnqXKa5yRuqZBj8XvtQ=
 		</data>
 		<key>PrivateHeaders/LYRSyncableChange.h</key>
 		<data>
@@ -665,11 +665,11 @@
 		</data>
 		<key>Headers/LYRClient.h</key>
 		<data>
-		QWFWEmYP2+zo0Hl0V3wK8Wtw1Oo=
+		8QhNcsorTLGG3T5/KRNtx3sd+OA=
 		</data>
 		<key>Headers/LYRConstants.h</key>
 		<data>
-		5D7MRmkSIUOzKExYUmiQ0eWI8nw=
+		8Kv9nDXRL6z+qd3Wy1ruo04oS2c=
 		</data>
 		<key>Headers/LYRConversation.h</key>
 		<data>
@@ -789,7 +789,7 @@
 		</data>
 		<key>PrivateHeaders/LYRClient+Private.h</key>
 		<data>
-		igYBuJoGEdF6i5BCh0HoY7hJHf8=
+		pwgo0TzCx8QxfsjAsAx4UltXsos=
 		</data>
 		<key>PrivateHeaders/LYRConcurrentOperation.h</key>
 		<data>
@@ -1001,7 +1001,7 @@
 		</data>
 		<key>PrivateHeaders/LYRLog.h</key>
 		<data>
-		mhWNjoi9CgzgRmW0G/HSp+/a4JA=
+		EBJZaThj5bnt3RbVvahID5C2ba0=
 		</data>
 		<key>PrivateHeaders/LYRMacros.h</key>
 		<data>
@@ -1213,7 +1213,7 @@
 		</data>
 		<key>PrivateHeaders/LYRStreamRepository.h</key>
 		<data>
-		G06d+J13gcGTinX5wWUTYx3L5sw=
+		xQhqwMBTjnqXKa5yRuqZBj8XvtQ=
 		</data>
 		<key>PrivateHeaders/LYRSyncableChange.h</key>
 		<data>
