@@ -26,8 +26,8 @@ class ImageMessageCell: MessageCell, ASNetworkImageNodeDelegate {
         
         imageNode.delegate = self
         
-        imageNode.imageModificationBlock = { [unowned self] (image) in
-            var toucanImage = Toucan(image: image).resize(self.requiredImageSize)
+        imageNode.imageModificationBlock = { (image) in
+            var toucanImage = Toucan(image: image).resize(CGSizeMake(200, 200/4*3))
             toucanImage = toucanImage.maskWithPath(path: UIBezierPath(roundedRect: CGRectMake(0, 0, toucanImage.image.size.width, toucanImage.image.size.height), cornerRadius: 18))
             return toucanImage.image
         }
@@ -43,13 +43,14 @@ class ImageMessageCell: MessageCell, ASNetworkImageNodeDelegate {
         }
     }
     
-    override func layout() {
-        super.layout()
-        imageNode.frame = bubbleNode.frame
-        requiredImageSize = imageNode.bounds.size
+    override func layoutSpecForBubbneNode(bubbleNode: ASDisplayNode) -> ASLayoutSpec {
+        
+        imageNode.sizeRange = ASRelativeSizeRangeMakeWithExactCGSize(CGSizeMake(200, 200/4*3))
+        let imageSizeSpec = ASStaticLayoutSpec(children: [imageNode])
+        return ASBackgroundLayoutSpec(child: imageSizeSpec, background: bubbleNode)
     }
     
-    func layoutSpecForMessageBubble() -> ASLayoutSpec {
+    /*func layoutSpecForMessageBubble() -> ASLayoutSpec {
         
         let sizeLayout = ASStackLayoutSpec(direction: .Horizontal, spacing: 0, justifyContent: .Start, alignItems: .Start, children: [bubbleNode])
         
@@ -61,7 +62,7 @@ class ImageMessageCell: MessageCell, ASNetworkImageNodeDelegate {
         let aspectLayout = ASRatioLayoutSpec(ratio: 4/3, child: bubbleNode)
         
         return ASStaticLayoutSpec(children: [sizeLayout, aspectLayout])
-    }
+    }*/
 
     func imageNode(imageNode: ASNetworkImageNode!, didLoadImage image: UIImage!) {
         

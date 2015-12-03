@@ -101,27 +101,40 @@ class MessageCell: ASCellNode {
     
     override func layoutSpecThatFits(constrainedSize: ASSizeRange) -> ASLayoutSpec! {
         
-        var children = [ASLayoutable]()
+        
+        var rootSpec: ASLayoutSpec!
         
         if isIncommingMessage == true {
             
-            children.append(ASStackLayoutSpec(direction: .Horizontal, spacing: avatarBubbleHorizontalDistance, justifyContent: .Start, alignItems: .Start, children: [avatarImageNode, bubbleNode]))
-        } else {
+            avatarImageNode.sizeRange = ASRelativeSizeRangeMakeWithExactCGSize(CGSizeMake(36, 36))
             
-            children.append(ASStackLayoutSpec(direction: .Horizontal, spacing: 0, justifyContent: .End, alignItems: .Start, children: [bubbleNode]))
+            let imageSizeLayout = ASStaticLayoutSpec(children: [avatarImageNode])
+            let bubbleSizeLayout = layoutSpecForBubbneNode(bubbleNode)
+            bubbleSizeLayout.flexShrink = true
+            
+            rootSpec = ASStackLayoutSpec(direction: .Horizontal, spacing: avatarBubbleHorizontalDistance, justifyContent: .Start, alignItems: .Start, children: [imageSizeLayout, bubbleSizeLayout])
+        } else {
+
+            let bubbleSizeLayout = layoutSpecForBubbneNode(bubbleNode)
+            bubbleSizeLayout.flexShrink = true
+            
+            rootSpec = ASStackLayoutSpec(direction: .Horizontal, spacing: avatarBubbleHorizontalDistance, justifyContent: .End, alignItems: .End, children: [bubbleSizeLayout])
         }
         
         if headerText?.characters.count > 0 {
-            
-            children.append(ASStackLayoutSpec(direction: .Vertical, spacing: 0, justifyContent: .End, alignItems: .Start, children: [headerTextNode, bubbleNode]))
-        } else {
-            
-            children.append(bubbleNode)
+            //let centerSpec = ASStackLayoutSpec(direction: .Horizontal, spacing: 0, justifyContent: .Center, alignItems: .Center, children: [headerTextNode])
+            //centerSpec.flexGrow = true
+            rootSpec = ASStackLayoutSpec(direction: .Vertical, spacing: 10, justifyContent: .Start, alignItems: .Start, children: [headerTextNode, rootSpec])
         }
-        
-        let childLayout = 
 
-        return ASInsetLayoutSpec(insets: UIEdgeInsetsMake(topVerticalPadding, leadingHorizontalPadding, bottomVerticalPadding, trailingHorizontalPadding), child: nil)
+        rootSpec = ASInsetLayoutSpec(insets: UIEdgeInsetsMake(topVerticalPadding, leadingHorizontalPadding, bottomVerticalPadding, trailingHorizontalPadding), child: rootSpec)
+        return rootSpec
+    }
+    
+    func layoutSpecForBubbneNode(bubbleNode: ASDisplayNode) -> ASLayoutSpec {
+        
+        bubbleNode.sizeRange = ASRelativeSizeRangeMakeWithExactCGSize(CGSizeMake(76, 36))
+        return ASStaticLayoutSpec(children: [bubbleNode])
     }
 
 }

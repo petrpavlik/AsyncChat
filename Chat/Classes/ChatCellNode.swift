@@ -20,8 +20,6 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
     
     var bubbleTextMargin: CGFloat = 10
     
-    private var cachedTextNodeSize: CGSize?
-    
     init(message: String, isIncomming: Bool) {
         super.init()
         
@@ -61,28 +59,11 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
         }
     }
     
-    override func layout() {
-        super.layout()
-        messageTextNode.frame = CGRectInset(bubbleNode.frame, bubbleTextMargin, bubbleTextMargin)
-    }
-    
-    override func requiredBubbleSize(maxWidth: CGFloat) -> CGSize {
+    override func layoutSpecForBubbneNode(bubbleNode: ASDisplayNode) -> ASLayoutSpec {
         
-        var size = CGSizeZero
-        if cachedTextNodeSize != nil {
-            size = cachedTextNodeSize!
-        } else {
-            size = messageTextNode.attributedString.boundingRectWithSize(CGSizeMake(maxWidth-2*bubbleTextMargin, 1000), options: [NSStringDrawingOptions.UsesLineFragmentOrigin, NSStringDrawingOptions.UsesFontLeading], context: nil).size
-            cachedTextNodeSize = size
-        }
-        size.width += 2*bubbleTextMargin
-        size.height += 2*bubbleTextMargin
-        return size
-    }
-    
-    override func invalidateCalculatedLayout() {
-        super.invalidateCalculatedLayout()
-        cachedTextNodeSize = nil
+        let spec = ASInsetLayoutSpec(insets: UIEdgeInsetsMake(bubbleTextMargin, bubbleTextMargin, bubbleTextMargin, bubbleTextMargin), child: messageTextNode)
+        
+        return ASBackgroundLayoutSpec(child: spec, background: bubbleNode)
     }
     
     func textNode(textNode: ASTextNode!, shouldHighlightLinkAttribute attribute: String!, value: AnyObject!, atPoint point: CGPoint) -> Bool {

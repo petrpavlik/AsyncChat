@@ -72,11 +72,7 @@ class TypingMessageCell: MessageCell {
     
     func layoutSpecForMessageBubble() -> ASLayoutSpec! {
         let spec = ASStaticLayoutSpec()
-        spec.
+        //spec.
         return spec
-    }
-    
-    override func requiredBubbleSize(maxWidth: CGFloat) -> CGSize {
-        return CGSizeMake(76, 36)
     }
 }
