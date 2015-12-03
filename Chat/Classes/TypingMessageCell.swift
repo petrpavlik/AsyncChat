@@ -70,6 +70,12 @@ class TypingMessageCell: MessageCell {
         circleNode2.frame = CGRectMake(51+10+12+10+12+10, (bounds.height-12)/2, 12, 12)
     }
     
+    func layoutSpecForMessageBubble() -> ASLayoutSpec! {
+        let spec = ASStaticLayoutSpec()
+        spec.
+        return spec
+    }
+    
     override func requiredBubbleSize(maxWidth: CGFloat) -> CGSize {
         return CGSizeMake(76, 36)
     }

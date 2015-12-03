@@ -74,10 +74,6 @@ class MessageCell: ASCellNode {
     
     var isIncommingMessage = true
     
-    func requiredBubbleSize(maxWidth: CGFloat) -> CGSize {
-        preconditionFailure("This method must be overridden")
-    }
-    
     // MARK:
     
     override init!() {
@@ -103,42 +99,29 @@ class MessageCell: ASCellNode {
         
     }
     
-    override func calculateSizeThatFits(constrainedSize: CGSize) -> CGSize {
+    override func layoutSpecThatFits(constrainedSize: ASSizeRange) -> ASLayoutSpec! {
         
-        let headerHeight = headerText?.characters.count > 0 ? headerTextHeight : 0
+        var children = [ASLayoutable]()
         
-        return CGSizeMake(constrainedSize.width, requiredBubbleSize(maxBubbleWidth(constrainedSize.width)).height + topVerticalPadding + bottomVerticalPadding + headerHeight)
-    }
-    
-    override func layout() {
-        
-        super.layout()
-        
-        var bubbleSize = requiredBubbleSize(maxBubbleWidth(frame.width))
-        bubbleSize.width = max(40, bubbleSize.width)
-        
-        let headerHeight = headerText?.characters.count > 0 ? headerTextHeight : 0
-        
-        if isIncommingMessage == false {
+        if isIncommingMessage == true {
             
-            bubbleNode.frame = CGRectMake(bounds.width - (26 + bubbleSize.width), topVerticalPadding + headerHeight, bubbleSize.width, bubbleSize.height)
-            
+            children.append(ASStackLayoutSpec(direction: .Horizontal, spacing: avatarBubbleHorizontalDistance, justifyContent: .Start, alignItems: .Start, children: [avatarImageNode, bubbleNode]))
         } else {
             
-            avatarImageNode.frame = CGRectMake(leadingHorizontalPadding, topVerticalPadding + headerHeight, avatarImageSize.width, avatarImageSize.height)
-            
-            bubbleNode.frame = CGRectMake(leadingHorizontalPadding+avatarImageSize.width+avatarBubbleHorizontalDistance, topVerticalPadding + headerHeight, bubbleSize.width, bubbleSize.height)
-            
+            children.append(ASStackLayoutSpec(direction: .Horizontal, spacing: 0, justifyContent: .End, alignItems: .Start, children: [bubbleNode]))
         }
         
-        if headerHeight > 0 {
-            headerTextNode.frame = CGRectMake(leadingHorizontalPadding, 0, bounds.width-2*leadingHorizontalPadding, headerTextHeight)
+        if headerText?.characters.count > 0 {
+            
+            children.append(ASStackLayoutSpec(direction: .Vertical, spacing: 0, justifyContent: .End, alignItems: .Start, children: [headerTextNode, bubbleNode]))
+        } else {
+            
+            children.append(bubbleNode)
         }
-    }
-    
-    private func maxBubbleWidth(cellWidth: CGFloat) -> CGFloat {
-        return cellWidth - leadingHorizontalPadding - avatarImageSize.width - avatarBubbleHorizontalDistance - trailingHorizontalPadding
-    }
+        
+        let childLayout = 
 
+        return ASInsetLayoutSpec(insets: UIEdgeInsetsMake(topVerticalPadding, leadingHorizontalPadding, bottomVerticalPadding, trailingHorizontalPadding), child: nil)
+    }
 
 }

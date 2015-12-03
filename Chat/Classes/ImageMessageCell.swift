@@ -49,9 +49,18 @@ class ImageMessageCell: MessageCell, ASNetworkImageNodeDelegate {
         requiredImageSize = imageNode.bounds.size
     }
     
-    override func requiredBubbleSize(maxWidth: CGFloat) -> CGSize {
+    func layoutSpecForMessageBubble() -> ASLayoutSpec {
         
-        return CGSizeMake(maxWidth, (maxWidth/4)*3)
+        let sizeLayout = ASStackLayoutSpec(direction: .Horizontal, spacing: 0, justifyContent: .Start, alignItems: .Start, children: [bubbleNode])
+        
+        sizeLayout.sizeRange = ASRelativeSizeRangeMake(
+            ASRelativeSizeMake(ASRelativeDimensionMakeWithPoints(100), ASRelativeDimensionMakeWithPoints(0)),
+            ASRelativeSizeMake(ASRelativeDimensionMakeWithPoints(100), ASRelativeDimensionMakeWithPoints(100))
+        )
+        
+        let aspectLayout = ASRatioLayoutSpec(ratio: 4/3, child: bubbleNode)
+        
+        return ASStaticLayoutSpec(children: [sizeLayout, aspectLayout])
     }
 
     func imageNode(imageNode: ASNetworkImageNode!, didLoadImage image: UIImage!) {
