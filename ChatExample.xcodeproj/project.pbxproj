@@ -289,7 +289,7 @@
 					};
 				};
 			};
-			buildConfigurationList = EFAFCEBC1BB6EE3900E91371 /* Build configuration list for PBXProject "Chat" */;
+			buildConfigurationList = EFAFCEBC1BB6EE3900E91371 /* Build configuration list for PBXProject "ChatExample" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -616,7 +616,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		EFAFCEBC1BB6EE3900E91371 /* Build configuration list for PBXProject "Chat" */ = {
+		EFAFCEBC1BB6EE3900E91371 /* Build configuration list for PBXProject "ChatExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EFAFCEE71BB6EE3900E91371 /* Debug */,
