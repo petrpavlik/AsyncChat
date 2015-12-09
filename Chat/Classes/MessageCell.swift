@@ -10,7 +10,7 @@ import UIKit
 import Toucan
 import AsyncDisplayKit
 
-class MessageCell: ASCellNode {
+public class MessageCell: ASCellNode {
     
     // MARK: Layout constants
     private let topVerticalPadding: CGFloat = 10.0
@@ -39,15 +39,15 @@ class MessageCell: ASCellNode {
     
     // MARK: 
     
-    let avatarImageNode = ASNetworkImageNode()
-    let bubbleNode = ASDisplayNode { () -> UIView! in
+    public let avatarImageNode = ASNetworkImageNode()
+    public let bubbleNode = ASDisplayNode { () -> UIView! in
         let imageView = UIImageView(image: bubbleImage)
         return imageView
     }
     
     private let headerTextNode = ASTextNode()
     
-    var headerText: String? {
+    public var headerText: String? {
         didSet {
             if headerText?.characters.count > 0 {
                 headerTextNode.hidden = false
@@ -72,11 +72,11 @@ class MessageCell: ASCellNode {
     
     // MARK:
     
-    var isIncommingMessage = true
+    var isIncomingMessage = true
     
     // MARK:
     
-    override init!() {
+    public override init!() {
         super.init()
         
         selectionStyle = .None
@@ -99,12 +99,12 @@ class MessageCell: ASCellNode {
         
     }
     
-    override func layoutSpecThatFits(constrainedSize: ASSizeRange) -> ASLayoutSpec! {
+    override public func layoutSpecThatFits(constrainedSize: ASSizeRange) -> ASLayoutSpec! {
         
         
         var rootSpec: ASLayoutSpec!
         
-        if isIncommingMessage == true {
+        if isIncomingMessage == true {
             
             avatarImageNode.sizeRange = ASRelativeSizeRangeMakeWithExactCGSize(CGSizeMake(36, 36))
             

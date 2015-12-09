@@ -10,7 +10,7 @@ import UIKit
 import AsyncDisplayKit
 import Toucan
 
-class ChatCellNode: MessageCell, ASTextNodeDelegate {
+public class ChatCellNode: MessageCell, ASTextNodeDelegate {
     
     var incomingMessageTextColor = UIColor.blackColor()
     var outgoingMessageTextColor = UIColor.whiteColor()
@@ -20,7 +20,7 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
     
     var bubbleTextMargin: CGFloat = 10
     
-    init(message: String, isIncomming: Bool) {
+    public init(message: String, isIncoming: Bool) {
         super.init()
         
         addSubnode(messageTextNode)
@@ -32,12 +32,12 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
         messageTextNode.linkAttributeNames = ["aaa"]
         
         
-        isIncommingMessage = isIncomming
+        isIncomingMessage = isIncoming
         
-        let attributes = [NSFontAttributeName: UIFont.systemFontOfSize(17), NSForegroundColorAttributeName: isIncomming == true ? incomingMessageTextColor : outgoingMessageTextColor]
+        let attributes = [NSFontAttributeName: UIFont.systemFontOfSize(17), NSForegroundColorAttributeName: isIncoming == true ? incomingMessageTextColor : outgoingMessageTextColor]
         let attributedString = NSAttributedString(string: message, attributes: attributes).mutableCopy() as! NSMutableAttributedString
         
-        avatarImageNode.hidden = !isIncomming
+        avatarImageNode.hidden = !isIncoming
         //avatarImageNode.setURL(avatarURL, resetToDefault: false)
         
         let types: NSTextCheckingType = [.Link, .PhoneNumber]
@@ -52,7 +52,7 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
         
         messageTextNode.attributedString = attributedString
         
-        if isIncomming == true {
+        if isIncoming == true {
             bubbleNode.tintColor = incomingMessageColorNormal
         } else {
             bubbleNode.tintColor = outgoingMessageColorNormal
@@ -66,19 +66,19 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
         return ASBackgroundLayoutSpec(child: spec, background: bubbleNode)
     }
     
-    func textNode(textNode: ASTextNode!, shouldHighlightLinkAttribute attribute: String!, value: AnyObject!, atPoint point: CGPoint) -> Bool {
+    public func textNode(textNode: ASTextNode!, shouldHighlightLinkAttribute attribute: String!, value: AnyObject!, atPoint point: CGPoint) -> Bool {
         return true
     }
     
-    func textNode(textNode: ASTextNode!, shouldLongPressLinkAttribute attribute: String!, value: AnyObject!, atPoint point: CGPoint) -> Bool {
+    public func textNode(textNode: ASTextNode!, shouldLongPressLinkAttribute attribute: String!, value: AnyObject!, atPoint point: CGPoint) -> Bool {
         return true
     }
     
-    func textNode(textNode: ASTextNode!, tappedLinkAttribute attribute: String!, value: AnyObject!, atPoint point: CGPoint, textRange: NSRange) {
+    public func textNode(textNode: ASTextNode!, tappedLinkAttribute attribute: String!, value: AnyObject!, atPoint point: CGPoint, textRange: NSRange) {
         UIApplication.sharedApplication().openURL(value as! NSURL)
     }
     
-    override func didLoad() {
+    override public func didLoad() {
         super.didLoad()
         
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: Selector("bubbleLongPressed:"))
@@ -101,7 +101,7 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
         }
     }
     
-    override func touchesBegan(touches: Set<NSObject>!, withEvent event: UIEvent!) {
+    override public func touchesBegan(touches: Set<NSObject>!, withEvent event: UIEvent!) {
         super.touchesBegan(touches, withEvent: event)
         
         setBubbleBackgroundForSelectedState()
@@ -112,7 +112,7 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
         }
     }
     
-    override func touchesEnded(touches: Set<NSObject>!, withEvent event: UIEvent!) {
+    override public func touchesEnded(touches: Set<NSObject>!, withEvent event: UIEvent!) {
         super.touchesEnded(touches, withEvent: event)
         
         if UIMenuController.sharedMenuController().menuVisible == false {
@@ -120,7 +120,7 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
         }
     }
     
-    override func touchesCancelled(touches: Set<NSObject>!, withEvent event: UIEvent!) {
+    override public func touchesCancelled(touches: Set<NSObject>!, withEvent event: UIEvent!) {
         super.touchesCancelled(touches, withEvent: event)
         
         if UIMenuController.sharedMenuController().menuVisible == false {
@@ -133,12 +133,12 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
         UIPasteboard.generalPasteboard().string = messageTextNode.attributedString.string
     }
     
-    override func canBecomeFirstResponder() -> Bool {
+    override public func canBecomeFirstResponder() -> Bool {
         return true
     }
     
     private func setBubbleBackgroundForNormalState() {
-        if isIncommingMessage == false {
+        if isIncomingMessage == false {
             bubbleNode.tintColor = outgoingMessageColorNormal
         } else {
             bubbleNode.tintColor = incomingMessageColorNormal
@@ -146,7 +146,7 @@ class ChatCellNode: MessageCell, ASTextNodeDelegate {
     }
     
     private func setBubbleBackgroundForSelectedState() {
-        if isIncommingMessage == false {
+        if isIncomingMessage == false {
             bubbleNode.tintColor = outgoingMessageColorSelected
         } else {
             bubbleNode.tintColor = incomingMessageColorSelected

@@ -10,17 +10,17 @@ import UIKit
 import AsyncDisplayKit
 import Toucan
 
-class ImageMessageCell: MessageCell, ASNetworkImageNodeDelegate {
+public class ImageMessageCell: MessageCell, ASNetworkImageNodeDelegate {
     
     private let imageNode = ASNetworkImageNode()
     
     //FIXME: This is probably called on multiple threads.
     private var requiredImageSize = CGSizeZero
     
-    init(imageURL: NSURL, isIncomming: Bool) {
+    public init(imageURL: NSURL, isIncomming: Bool) {
         super.init()
         
-        self.isIncommingMessage = isIncomming
+        self.isIncomingMessage = isIncomming
         
         addSubnode(imageNode)
         
@@ -34,7 +34,7 @@ class ImageMessageCell: MessageCell, ASNetworkImageNodeDelegate {
         
         imageNode.setURL(imageURL, resetToDefault: true)
         
-        isIncommingMessage = isIncomming
+        isIncomingMessage = isIncomming
         
         if isIncomming == true {
             bubbleNode.tintColor = incomingMessageColorNormal
@@ -64,7 +64,7 @@ class ImageMessageCell: MessageCell, ASNetworkImageNodeDelegate {
         return ASStaticLayoutSpec(children: [sizeLayout, aspectLayout])
     }*/
 
-    func imageNode(imageNode: ASNetworkImageNode!, didLoadImage image: UIImage!) {
+    public func imageNode(imageNode: ASNetworkImageNode!, didLoadImage image: UIImage!) {
         
     }
     

@@ -8,6 +8,7 @@
 
 import UIKit
 import AsyncDisplayKit
+import AsyncChat
 
 class TextMessage: TextMessageProtocol {
     
@@ -45,7 +46,7 @@ class ViewController: ChatViewController, ChatViewControllerDataSource {
         let isIncoming = index != 2
         
         if let message = messages[Int(index)] as? TextMessage {
-            let cellNode = ChatCellNode(message: message.text, isIncomming: isIncoming)
+            let cellNode = ChatCellNode(message: message.text, isIncoming: isIncoming)
             if isIncoming == true {
                 cellNode.avatarImageNode.setURL(NSURL(string: "https://pbs.twimg.com/profile_images/477397164453527552/uh2w1u1o.jpeg")!, resetToDefault: true)
                 cellNode.headerText = index % 3 == 0 ? "5 minutes ago" : nil

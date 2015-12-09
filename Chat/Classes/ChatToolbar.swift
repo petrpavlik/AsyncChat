@@ -8,10 +8,10 @@
 
 import UIKit
 
-class ChatInputBar: UIView, UITextViewDelegate {
+public class ChatInputBar: UIView, UITextViewDelegate {
     
-    var keyboardFrameChangedBlock: ((frame: CGRect) -> Void)?
-    var sizeUpdateRequiredBlock: (() -> Void)?
+    public var keyboardFrameChangedBlock: ((frame: CGRect) -> Void)?
+    public var sizeUpdateRequiredBlock: (() -> Void)?
     
     private var requiredHeight: CGFloat = 44
 
@@ -67,11 +67,11 @@ class ChatInputBar: UIView, UITextViewDelegate {
         configureView()
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func textViewDidChange(textView: UITextView) {
+    public func textViewDidChange(textView: UITextView) {
         
         let requiredSize = textView.attributedText.boundingRectWithSize(CGSizeMake(textView.frame.width, 1000), options: [NSStringDrawingOptions.UsesLineFragmentOrigin, NSStringDrawingOptions.UsesFontLeading], context: nil).size
         
@@ -84,7 +84,7 @@ class ChatInputBar: UIView, UITextViewDelegate {
         sizeUpdateRequiredBlock?()
     }
     
-    override func intrinsicContentSize() -> CGSize {
+    public override func intrinsicContentSize() -> CGSize {
         return CGSizeMake(320, requiredHeight)
     }
     

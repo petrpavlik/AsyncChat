@@ -9,7 +9,7 @@
 import UIKit
 import AsyncDisplayKit
 
-class TypingMessageCell: MessageCell {
+public class TypingMessageCell: MessageCell {
     
     func startAnimating() {
         
@@ -54,7 +54,7 @@ class TypingMessageCell: MessageCell {
     private let circleNode1 = CircleNode(animationDelay: 0.2)
     private let circleNode2 = CircleNode(animationDelay: 0.4)
     
-    override init!() {
+    public override init!() {
         super.init()
         
         addSubnode(circleNode0)
@@ -62,7 +62,7 @@ class TypingMessageCell: MessageCell {
         addSubnode(circleNode2)
     }
     
-    override func layout() {
+    public override func layout() {
         super.layout()
         
         circleNode0.frame = CGRectMake(51+10, (bounds.height-12)/2, 12, 12)

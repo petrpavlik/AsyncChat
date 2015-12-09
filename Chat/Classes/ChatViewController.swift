@@ -9,7 +9,7 @@
 import UIKit
 import AsyncDisplayKit
 
-protocol ChatViewControllerDataSource: class {
+public protocol ChatViewControllerDataSource: class {
     func messageCellForIndex(index: UInt) -> MessageCell
     func numberOfMessages() -> UInt
 }
@@ -19,25 +19,25 @@ protocol ChatViewControllerDataSource: class {
 }*/
 
 
-class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDelegate {
+public class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDelegate {
     
-    weak var dataSource: ChatViewControllerDataSource!
+    public weak var dataSource: ChatViewControllerDataSource!
     
-    enum Sections: Int {
+    public enum Sections: Int {
         case LoadingIndicator = 0, Content, TypingIndicator
     }
     
-    enum Avatar {
+    public enum Avatar {
         case NoAvatar
         case URL(NSURL)
         case Image(UIImage)
     }
     
-    var otherUserAvatar = Avatar.NoAvatar
+    public var otherUserAvatar = Avatar.NoAvatar
     
-    let tableView = ASTableView(frame: CGRectZero, style: .Plain)
+    public let tableView = ASTableView(frame: CGRectZero, style: .Plain)
     
-    var typing = false {
+    public var typing = false {
         didSet {
             if tableView.numberOfSections > 0 {
                 tableView.beginUpdates()
@@ -52,7 +52,7 @@ class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDe
         }
     }
     
-    override func loadView() {
+    override public func loadView() {
         super.loadView()
         
         tableView.asyncDataSource = self
@@ -63,18 +63,18 @@ class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDe
         view.addSubview(tableView)
     }
     
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     }
     
-    override func viewDidLayoutSubviews() {
+    override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
         tableView.frame = CGRectMake(0, topLayoutGuide.length, view.bounds.width, view.bounds.height - topLayoutGuide.length)
     }
     
-    func scrollToBottom(animated: Bool) {
+    public func scrollToBottom(animated: Bool) {
         
         if tableView.numberOfSections == 0 {
             return
@@ -93,7 +93,7 @@ class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDe
         tableView.scrollToRowAtIndexPath(indexPath, atScrollPosition: .Bottom, animated: animated)
     }
     
-    func tableView(tableView: UITableView!, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(tableView: UITableView!, numberOfRowsInSection section: Int) -> Int {
         switch section {
         case Sections.Content.rawValue: return Int(dataSource.numberOfMessages())
         case Sections.TypingIndicator.rawValue: return Int(typing == true)
@@ -102,11 +102,11 @@ class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDe
         }
     }
     
-    func numberOfSectionsInTableView(tableView: UITableView!) -> Int {
+    public func numberOfSectionsInTableView(tableView: UITableView!) -> Int {
         return 3
     }
 
-    func tableView(tableView: ASTableView!, nodeForRowAtIndexPath indexPath: NSIndexPath!) -> ASCellNode! {
+    public func tableView(tableView: ASTableView!, nodeForRowAtIndexPath indexPath: NSIndexPath!) -> ASCellNode! {
         
         if indexPath.section == Sections.Content.rawValue {
             
@@ -130,7 +130,7 @@ class ChatViewController: UIViewController, ASTableViewDataSource, ASTableViewDe
         }
     }
     
-    func tableView(tableView: ASTableView!, willDisplayNodeForRowAtIndexPath indexPath: NSIndexPath!) {
+    public func tableView(tableView: ASTableView!, willDisplayNodeForRowAtIndexPath indexPath: NSIndexPath!) {
         if indexPath.section == Sections.LoadingIndicator.rawValue {
             let loadingCellNode = tableView.nodeForRowAtIndexPath(indexPath) as! LoadingCellNode
             loadingCellNode.startAnimating()
